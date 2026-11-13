@@ -156,14 +156,45 @@
       · 设置里试导出 / 备份恢复
     </div>
     <div class="wg-label">手机桌面小卡片 · 可直接勾选</div>
-    <div id="widgetHost"></div>
+    <div id="widgetHost"><div class="widget">
+    <div class="wg-head" data-nav="today"><span class="wg-title">印记 · 今天</span><span class="wg-date">11月13日 周五</span></div>
+    <div class="wg-sec">今日习惯</div>
+    <div class="wg-row" data-wtoggle-h="2"><span class="wg-check" style="border-color:#4C7EF3"></span><span class="wg-txt">喝水 8 杯</span></div><div class="wg-row" data-wtoggle-h="3"><span class="wg-check" style="border-color:#E88B4A"></span><span class="wg-txt">跑步</span></div>
+    <div class="wg-sec wg-sec2">待办</div>
+    <div class="wg-row" data-wtoggle-t="1"><span class="wg-check"></span><span class="wg-txt">交季度报表</span></div><div class="wg-row" data-wtoggle-t="2"><span class="wg-check"></span><span class="wg-txt">给妈妈回电话</span></div>
+    <div class="wg-more">还有 2 项 · 点空白处打开 App</div>
+  </div></div>
     <div class="hint2">卡片上的勾选是一次性的：点一下即写库完成并消失；要取消/补卡请进 App。桌面组件由 Jetpack Glance 实现。</div>
   </div>
 
   <div class="phone-wrap">
     <div class="phone">
-      <div id="screen"></div>
-      <div id="navbar"></div>
+      <div id="screen"><div class="status"><span>9:41</span><span>●●● ▮</span></div>
+  <div class="page-head"><div><div class="hello">早上好，秋殇</div><div class="sub">11 月 13 日 · 周五</div></div><button class="icon-btn" data-act="settings">⚙</button></div>
+  <div class="card progress-card">
+    <div class="pc-top"><div><div class="pc-label">今日进度</div><div class="pc-num">1<span>/3</span></div></div><div class="pc-ring" style="--p:33"><span>33%</span></div></div>
+    <div class="pc-bar"><i style="width:33%"></i></div>
+    <div class="pc-hint">点一下圆圈即可打卡，再点一下可取消</div>
+  </div>
+  <div class="sec-title">今日习惯 <button class="link" data-act="add-habit">＋ 新建</button></div>
+  
+    <div class="card habit-row" data-detail="1">
+      <span class="habit-check on" style="--c:#2E9E8F" data-toggle-h="1">✓</span>
+      <div class="habit-main"><div class="habit-name dim">早读 20 分钟</div><div class="habit-meta">每天 · 连续 <b>12</b> 天</div></div>
+      <span class="chev">›</span>
+    </div>
+    <div class="card habit-row" data-detail="2">
+      <span class="habit-check " style="--c:#4C7EF3" data-toggle-h="2"></span>
+      <div class="habit-main"><div class="habit-name ">喝水 8 杯</div><div class="habit-meta">每天 · 连续 <b>5</b> 天</div></div>
+      <span class="chev">›</span>
+    </div>
+    <div class="card habit-row" data-detail="3">
+      <span class="habit-check " style="--c:#E88B4A" data-toggle-h="3"></span>
+      <div class="habit-main"><div class="habit-name ">跑步</div><div class="habit-meta">周一/三/五 · 连续 <b>3</b> 天</div></div>
+      <span class="chev">›</span>
+    </div>
+  <div class="tip">💡 点习惯名可看月历热力图、给忘记的日子补卡</div></div>
+      <div id="navbar"><button class="on" data-tab="today"><span>◎</span>今日</button><button class="" data-tab="ledger"><span>¥</span>记账</button><button class="" data-tab="notes"><span>✎</span>备忘</button><button class="" data-tab="todos"><span>✓</span>待办</button></div>
       <div id="layers"></div>
     </div>
   </div>

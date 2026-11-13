@@ -1,4 +1,4 @@
-﻿*.iml
+*.iml
 .gradle/
 .kotlin/
 /local.properties
@@ -9,3 +9,6 @@
 /captures/
 .externalNativeBuild
 .cxx
+prototype/_edge_*/
+prototype/_gen_static.js
+prototype/_inline_check.js

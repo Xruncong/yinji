@@ -9,7 +9,7 @@
 | 平台 | 原生 Android（Kotlin），minSdk 31 / targetSdk 34 / compileSdk 34 |
 | 交付物 | 完整 Android 工程 + 命令行编译出的可安装 APK |
 
-> 配套可交互原型见 [`prototype/index.html`](../prototype/index.html)。原型为浏览器模拟，非真机截图。
+> 配套可交互原型见 [`prototype/index.html`](../prototype/index.html)（单文件自包含，含静态首屏兜底；ASCII 备份名 `prototype/yinji-prototype.html`）。原型为浏览器模拟，非真机截图。
 
 ---
 

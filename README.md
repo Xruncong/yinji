@@ -3,7 +3,7 @@
 一个**纯本地、不联网、无账号、无广告**的 Android 日常记录 App：习惯打卡、记账、备忘录、待办四合一，外加一张可直接勾选的桌面小卡片。
 
 - 📄 产品文档：[`docs/PRD.md`](docs/PRD.md)
-- 🖱️ 可交互原型：用浏览器打开 [`prototype/index.html`](prototype/index.html)（也可看 [`prototype/shots/`](prototype/shots/) 下的静态截图）
+- 🖱️ 可交互原型：用浏览器打开 [`prototype/index.html`](prototype/index.html)（**单文件、自包含、首屏静态兜底**，无需服务器、无需联网；若中文文件名/预览器不执行脚本导致空白，改开 ASCII 名的 [`prototype/yinji-prototype.html`](prototype/yinji-prototype.html)，内容完全相同）。静态截图见 [`prototype/shots/`](prototype/shots/)
 - 📱 平台：原生 Android（Kotlin + Jetpack Compose + Room + Jetpack Glance），minSdk 31 / compileSdk 34
 
 > 原型是浏览器模拟，不是真机截图；App 工程在 `app/` 下。
@@ -53,8 +53,9 @@ cd E:\Projects\yinji
 app/src/main/java/com/qiushang/yinji/   Kotlin 源码
 app/src/main/res/                      资源
 docs/PRD.md                            产品需求文档（含调研借鉴、数据模型、验收清单）
-prototype/index.html + app.js          可交互原型（纯前端模拟）
-prototype/shots/                       四张页面截图
+prototype/index.html + yinji-prototype.html  自包含可交互原型（同一份，静态首屏兜底）
+prototype/app.js                            原型脚本源码（已内联进上面的 HTML）
+prototype/shots/                            四张页面截图
 schemas/                               Room 导出的 schema（KSP 生成）
 ```
 
