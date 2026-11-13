@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">印记</string>
+    <string name="widget_name">印记 · 今天</string>
+    <string name="widget_description">今日习惯与待办，点一下即可完成</string>
+</resources>

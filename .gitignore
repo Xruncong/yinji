@@ -12,3 +12,9 @@
 prototype/_edge_*/
 prototype/_gen_static.js
 prototype/_inline_check.js
+/_actcheck/
+/_debug/
+/_dl_image.cmd
+/_dl_image.log
+/_emu.out
+/_emu.err

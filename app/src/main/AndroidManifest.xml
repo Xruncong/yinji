@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <application
         android:allowBackup="true"
-        android:label="印记"
+        android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Yinji">
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="印记"
+            android:label="@string/app_name"
             android:theme="@style/Theme.Yinji">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 桌面小卡片：Glance AppWidget。
+             刷新来源：App 内写入口 Repository.refreshWidget() 统一 updateAll +
+             跨日/改时间广播即时翻篇 + updatePeriodMillis 兜底。 -->
+        <receiver
+            android:name=".widget.YinjiWidgetReceiver"
+            android:exported="true"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/yinji_widget_info" />
+        </receiver>
     </application>
 </manifest>

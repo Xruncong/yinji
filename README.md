@@ -67,11 +67,29 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - **桌面小卡片**：习惯 + 待办同卡，点一下即写库完成并消失；App 内「已完成」列表可一键恢复（`done` 只标状态不删行）。刷新靠 Repository 层统一 `updateAll()`，0 点靠 `ACTION_DATE_CHANGED` + 重算今日兜底。
 - **金额 `Long` 存分**，月度汇总走 Room `GROUP BY`；日期业务键用本地 `yyyy-MM-dd`，周一起始。
 - **连续天数派生不落库**，按「应做日序列」相邻判断（指定周几的习惯跨周末不断链）。
-- **纯本地但必须能导出**：CSV 明细 + JSON 全量备份，免费、无需登录、不设笔数限制；用 SAF，不申请存储权限。
+- **纯本地但必须能导出**：JSON 全量备份（含软删记录），免费、无需登录、不设笔数限制；用 SAF，不申请存储权限。恢复会先弹「覆盖且不可撤销」确认，清空+回灌包在 Room 事务里，中途失败自动回滚。
 - 所有表预留 `updated_at` / `deleted_at`（软删）/ `device_id`，为二期同步留口子。
 
 ---
 
-## 状态
+## 状态（v1 已完成）
 
-工程骨架已通过 `assembleDebug`（BUILD SUCCESSFUL）；四个功能屏、Glance 卡片、导出恢复仍在实现中。进度见 [`docs/PRD.md`](docs/PRD.md) §11 验收清单。
+四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。
+
+**已在 Android 14（API 34）模拟器逐链路调试通过**（用户 m01043 要求）：
+
+| 链路 | 验证结果 |
+| --- | --- |
+| 冷启动 / 四 tab 导航 | 无崩溃，logcat 无 FATAL |
+| 习惯 | 新建 → 打卡 `0/1→1/1`、取消打卡软删、连续天数重算、月历热力图补卡 → `当前 1 天 / 最长 1 天 / 近30天 3%` |
+| 记账 | 分类 5 列网格与数字键盘同屏、金额 Long 存分（`¥32.80`）、月度总额/结余、环形占比图（餐饮/交通双段比例正确）、最近记录 |
+| 备忘 | `#标签` 抽取成 chip、正文搜索、置顶、编辑、删除 |
+| 待办 | 今天/全部/已完成分段、自然语言日期（`11/20`→`11 月 20 日 周五`）、逾期 `⚠ 已逾期` 标红、完成勾选 → 已完成「恢复」 |
+| 导出/恢复 | SAF 弹出 CreateDocument/OpenDocument，导出 JSON 2251B 结构正确，恢复后 5 表计数与明细一致（事务原子性验证通过） |
+| 桌面小卡片 | `dumpsys appwidget` 确认 `YinjiWidgetReceiver` provider 已注册 |
+
+调试中发现并修复的真实 bug：`NotesScreen` 空白输入可落库（`isNotBlank()` 与 `trim()` 判断不一致）、`importJson` 无事务可致数据全丢、`Money.parse` 浮点精度、`AddTransactionDialog` 日期不可改、`todayProgress` 未按 habitId 分组、`MainActivity` 在 composition 期间写 state。
+
+> 已知取舍：`parseNatural` 的 `M/D` 若已过去会按「最近的未来」顺延一年（沿用滴答清单语义）；补录逾期任务请用完整 `yyyy-MM-dd`。这是一期保留的默认值，非崩溃缺陷。
+
+二期（未做）：同步/账号、电脑端、预算与分类预算、提醒通知、富文本、子任务、可量化习惯目标等，见 [`docs/PRD.md`](docs/PRD.md)。
