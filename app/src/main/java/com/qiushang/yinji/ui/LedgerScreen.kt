@@ -2,6 +2,7 @@ package com.qiushang.yinji.ui
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,8 +69,8 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenHeader(title = "记账", subtitle = Dates.monthLabel(today), onSettings = onSettings)
 
-        // 月度总额卡
-        CardBox(Modifier.padding(horizontal = 16.dp)) {
+        // 月度总额卡（奶油黄强调卡，与概念图一致）
+        CreamCard(Modifier.padding(horizontal = 16.dp)) {
             Row(Modifier.fillMaxWidth()) {
                 AmountCell("本月支出", Money.format(expenseTotal), YinjiColors.Expense)
                 Box(Modifier.width(1.dp).height(38.dp).background(YinjiColors.Line))
@@ -88,7 +89,10 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                 EmptyHint("本月还没有支出")
             } else {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    DonutChart(sums, expenseTotal)
+                    Box(contentAlignment = Alignment.Center) {
+                        DonutChart(sums, expenseTotal)
+                        SproutBuddy(Modifier.size(46.dp))
+                    }
                     Spacer(Modifier.width(18.dp))
                     Column(Modifier.weight(1f)) {
                         sums.take(5).forEach { s ->
@@ -149,11 +153,7 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                             .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Box(
-                            Modifier.size(34.dp).clip(RoundedCornerShape(10.dp))
-                                .background(Color(cat.colorArgb).copy(alpha = 0.15f)),
-                            contentAlignment = Alignment.Center
-                        ) { Text(cat.emoji, fontSize = 17.sp) }
+                        CategoryEmoji(cat.emoji, Color(cat.colorArgb), size = 38.dp, emojiSize = 18)
                         Spacer(Modifier.width(10.dp))
                         Column(Modifier.weight(1f)) {
                             Text(if (t.note.isBlank()) cat.label else t.note,
@@ -301,13 +301,19 @@ private fun AddTransactionDialog(
                     Column(
                         Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(if (selected) Color(c.colorArgb).copy(alpha = 0.22f) else YinjiColors.Page)
+                            .clip(YinjiShapes.Small)
+                            .background(if (selected) Color(c.colorArgb).copy(alpha = 0.24f) else YinjiColors.Page)
+                            .border(
+                                1.dp,
+                                if (selected) Color(c.colorArgb) else Color.Transparent,
+                                YinjiShapes.Small
+                            )
                             .clickable { key = c.key }
                             .padding(vertical = 7.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(c.emoji, fontSize = 16.sp)
+                        CategoryEmoji(c.emoji, Color(c.colorArgb), size = 30.dp, emojiSize = 15)
+                        Spacer(Modifier.height(2.dp))
                         Text(c.label, fontSize = 9.sp, color = YinjiColors.Ink, maxLines = 1)
                     }
                 }
@@ -353,8 +359,9 @@ private fun AddTransactionDialog(
                         Modifier
                             .weight(1f)
                             .height(44.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(YinjiColors.Page)
+                            .clip(YinjiShapes.Small)
+                            .background(YinjiColors.Surface)
+                            .border(1.dp, YinjiColors.Line, YinjiShapes.Small)
                             .clickable {
                                 when (k) {
                                     "⌫" -> if (amount.isNotEmpty()) amount = amount.dropLast(1)

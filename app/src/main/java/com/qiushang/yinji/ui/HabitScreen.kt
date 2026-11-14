@@ -128,8 +128,8 @@ fun HabitScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                     Text("点一下圆圈即可打卡，再点一下可取消", fontSize = 11.sp, color = YinjiColors.Muted)
                 }
                 Spacer(Modifier.width(10.dp))
-                Sprout(
-                    modifier = Modifier.size((44 + 40 * f).dp),
+                SproutBuddy(
+                    modifier = Modifier.size((48 + 34 * f).dp),
                     color = YinjiColors.Primary
                 )
             }

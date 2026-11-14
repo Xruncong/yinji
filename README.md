@@ -81,6 +81,15 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - 进度卡由纯色方块改成浅薄荷底 + 墨绿字 + 薄荷轨道进度条；10+3 个分类色值降饱和成奶油色系；M3 `surfaceContainer*` 色 role 统一设成暖奶油，输入框不再有默认淡紫底。
 - 验收：`assembleDebug` 零警告 BUILD SUCCESSFUL；Android 14 模拟器四屏截图复看；`impeccable detect --json` 返回 `[]`（零违规）。
 
+### v1.2 功能界面细化（豆包二次出图）
+
+用户反馈「功能界面还是太丑」后，针对概念图里没落地的装饰细节再改一轮，功能逻辑仍未动。第二张概念图见 [`docs/ui-concept-ui2.png`](docs/ui-concept-ui2.png)，提示词见 [`docs/doubao-prompt-ui2.txt`](docs/doubao-prompt-ui2.txt)。
+
+- `SproutBuddy`：带笑脸、腮红和漂浮圆点的手绘小芽吉祥物（纯 Canvas 自绘），出现在进度卡、环形图中央和所有空态；`EmptyHint` 统一升级，内容少时下半屏不再空白。
+- `CreamCard`（奶油黄强调卡）用于月度总额；`CategoryEmoji` 给分类配柔和彩色圆底，替换过淡的方块底；记一笔弹层的分类格、数字键盘改为圆角糖果感。
+- 待办三分段、备忘 `#标签` 上糖果色（青绿 / 奶油黄 / 蜜桃粉，选中态压深保证白字可读）。
+- 验收：零警告编译；Android 14 模拟器四屏 + 空态 + 记一笔弹层截图复看；`impeccable detect` 零违规。
+
 ## 状态（v1 已完成）
 
 四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。

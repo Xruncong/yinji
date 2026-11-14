@@ -67,9 +67,9 @@ fun TodosScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             ScreenHeader(title = "待办", subtitle = "把要做的事放下", onSettings = onSettings)
 
             Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Chip("今天 ${todayList.size}", tab == 0, { tab = 0 })
-                Chip("全部 ${undone.size}", tab == 1, { tab = 1 })
-                Chip("已完成 ${done.size}", tab == 2, { tab = 2 })
+                Chip("今天 ${todayList.size}", tab == 0, { tab = 0 }, baseColor = YinjiColors.PrimaryDark)
+                Chip("全部 ${undone.size}", tab == 1, { tab = 1 }, baseColor = YinjiColors.CandyGold)
+                Chip("已完成 ${done.size}", tab == 2, { tab = 2 }, baseColor = YinjiColors.CandyPeach)
             }
 
             Spacer(Modifier.height(10.dp))

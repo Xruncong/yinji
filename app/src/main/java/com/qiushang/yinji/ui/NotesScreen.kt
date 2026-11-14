@@ -135,14 +135,19 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                                     if (tags.isNotEmpty()) {
                                         Spacer(Modifier.height(6.dp))
                                         Row {
-                                            tags.take(4).forEach { t ->
+                                            tags.take(4).forEachIndexed { i, t ->
+                                                val chipColor = when (i % 3) {
+                                                    0 -> YinjiColors.Cream
+                                                    1 -> YinjiColors.Peach
+                                                    else -> YinjiColors.PrimarySoft
+                                                }
                                                 Box(
                                                     Modifier
                                                         .padding(end = 6.dp)
                                                         .clip(YinjiShapes.Pill)
-                                                        .background(YinjiColors.PrimarySoft)
+                                                        .background(chipColor.copy(alpha = 0.55f))
                                                         .padding(horizontal = 7.dp, vertical = 2.dp)
-                                                ) { Text("#$t", fontSize = 10.sp, color = YinjiColors.PrimaryDark) }
+                                                ) { Text("#$t", fontSize = 10.sp, color = YinjiColors.Ink) }
                                             }
                                         }
                                     }

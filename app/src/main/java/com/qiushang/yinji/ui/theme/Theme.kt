@@ -23,6 +23,9 @@ object YinjiColors {
     val MintLight = Color(0xFFB7E7D6)
     val Cream = Color(0xFFF7D98C)
     val Peach = Color(0xFFF6B8AE)
+    /** 糖果色分段：压深一点，保证选中态白字对比度 */
+    val CandyGold = Color(0xFFC9922F)
+    val CandyPeach = Color(0xFFD9746A)
     val Ink = Color(0xFF33564B)
     val Muted = Color(0xFF5E7C70)
     val Expense = Color(0xFFE8736B)
