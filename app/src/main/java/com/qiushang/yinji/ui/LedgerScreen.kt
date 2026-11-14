@@ -44,6 +44,7 @@ import com.qiushang.yinji.data.CategorySum
 import com.qiushang.yinji.data.TransactionEntity
 import com.qiushang.yinji.data.YinjiRepository
 import com.qiushang.yinji.ui.theme.YinjiColors
+import com.qiushang.yinji.ui.theme.YinjiShapes
 import com.qiushang.yinji.util.Dates
 import com.qiushang.yinji.util.Money
 import kotlinx.coroutines.launch
@@ -177,8 +178,8 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 18.dp, bottom = 18.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(YinjiColors.Primary)
+                .clip(YinjiShapes.Pill)
+                .background(YinjiColors.PrimaryDark)
                 .clickable { showAdd = true }
                 .padding(horizontal = 20.dp, vertical = 13.dp),
             contentAlignment = Alignment.Center

@@ -14,6 +14,8 @@ prototype/_gen_static.js
 prototype/_inline_check.js
 /_actcheck/
 /_debug/
+/_m3check/
+/_edge_doubao/
 /_dl_image.cmd
 /_dl_image.log
 /_emu.out

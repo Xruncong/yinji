@@ -14,8 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.PushPin
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.qiushang.yinji.data.NoteEntity
 import com.qiushang.yinji.data.YinjiRepository
 import com.qiushang.yinji.ui.theme.YinjiColors
+import com.qiushang.yinji.ui.theme.YinjiShapes
 import com.qiushang.yinji.util.Dates
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -78,8 +82,8 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                 Spacer(Modifier.width(8.dp))
                 Box(
                     Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(YinjiColors.Primary)
+                        .clip(YinjiShapes.Pill)
+                        .background(YinjiColors.PrimaryDark)
                         .clickable {
                             val t = input.trim()
                             if (t.isNotEmpty()) {
@@ -96,7 +100,14 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             TextField(
                 value = query,
                 onValueChange = { query = it },
-                placeholder = { Text("🔍 搜索正文或 #标签", fontSize = 12.sp) },
+                placeholder = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Rounded.Search, contentDescription = null,
+                                tint = YinjiColors.Muted, modifier = Modifier.size(15.dp))
+                            Spacer(Modifier.width(6.dp))
+                            Text("搜索正文或 #标签", fontSize = 12.sp)
+                        }
+                    },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             )
@@ -115,7 +126,8 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                         ) {
                             Row(verticalAlignment = Alignment.Top) {
                                 if (n.pinned) {
-                                    Text("📌", fontSize = 13.sp)
+                                    Icon(Icons.Rounded.PushPin, contentDescription = "已置顶",
+                                        tint = YinjiColors.Expense, modifier = Modifier.size(15.dp))
                                     Spacer(Modifier.width(6.dp))
                                 }
                                 Column(Modifier.weight(1f)) {
@@ -127,7 +139,7 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                                                 Box(
                                                     Modifier
                                                         .padding(end = 6.dp)
-                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .clip(YinjiShapes.Pill)
                                                         .background(YinjiColors.PrimarySoft)
                                                         .padding(horizontal = 7.dp, vertical = 2.dp)
                                                 ) { Text("#$t", fontSize = 10.sp, color = YinjiColors.PrimaryDark) }

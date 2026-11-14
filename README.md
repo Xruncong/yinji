@@ -72,6 +72,15 @@ schemas/                               Room 导出的 schema（KSP 生成）
 
 ---
 
+## 视觉（v1.1「奶油薄荷 · 小芽生长」）
+
+用户反馈初版「UI 好丑」后按 `impeccable` skill 做的纯视觉改版，**功能逻辑一律未动**。概念图见 [`docs/ui-concept.png`](docs/ui-concept.png)（豆包出图），设计令牌与提示词见 [`docs/UI-doubao-prompts.md`](docs/UI-doubao-prompts.md)。
+
+- 奶白底 `#FBF8F1` + 薄荷绿 `#3A9A80` + 奶油黄/蜜桃粉点缀；软糖卡片（24dp 大圆角、y 偏移模糊阴影、奶油细描边）、全圆胶囊按钮/Chip。
+- 用真实线性图标（`material-icons-extended`）替换文字符号导航 ◉¥✎✓ 和 emoji 图标（🔍/📌/💡）；`Sprout` 为纯 Canvas 自绘小芽，随今日进度长大。
+- 进度卡由纯色方块改成浅薄荷底 + 墨绿字 + 薄荷轨道进度条；10+3 个分类色值降饱和成奶油色系；M3 `surfaceContainer*` 色 role 统一设成暖奶油，输入框不再有默认淡紫底。
+- 验收：`assembleDebug` 零警告 BUILD SUCCESSFUL；Android 14 模拟器四屏截图复看；`impeccable detect --json` 返回 `[]`（零违规）。
+
 ## 状态（v1 已完成）
 
 四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。

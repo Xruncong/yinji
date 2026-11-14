@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.qiushang.yinji.data.TodoEntity
 import com.qiushang.yinji.data.YinjiRepository
 import com.qiushang.yinji.ui.theme.YinjiColors
+import com.qiushang.yinji.ui.theme.YinjiShapes
 import com.qiushang.yinji.util.Dates
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -133,8 +134,8 @@ fun TodosScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 18.dp, bottom = 18.dp)
-                .clip(RoundedCornerShape(24.dp))
-                .background(YinjiColors.Primary)
+                .clip(YinjiShapes.Pill)
+                .background(YinjiColors.PrimaryDark)
                 .clickable { showAdd = true }
                 .padding(horizontal = 20.dp, vertical = 13.dp),
             contentAlignment = Alignment.Center
