@@ -14,10 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -189,35 +188,42 @@ private fun TodoEditDialog(
 
     YDialog(onDismiss = onDismiss) {
         DialogTitle(if (initial == null) "新建待办" else "编辑待办")
-        TextField(
+        CuteTextField(
             value = title,
             onValueChange = { title = it },
-            placeholder = { Text("要做什么？", fontSize = 13.sp) },
-            singleLine = true,
+            placeholder = "要做什么？",
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(12.dp))
-        Text("截止（可选，支持「明天」「周五」「3天后」「11/20」）", fontSize = 11.sp, color = YinjiColors.Muted)
+        Spacer(Modifier.height(14.dp))
+        SectionLabel("什么时候做", YinjiColors.CandyGold)
+        Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextField(
+            CuteTextField(
                 value = dateInput,
                 onValueChange = {
                     dateInput = it
                     val d = Dates.parseNatural(it, Dates.today())
                     hint = if (d != null) "→ ${Dates.friendlyDate(d)}" else null
                 },
-                placeholder = { Text("留空 = 无截止", fontSize = 12.sp) },
-                singleLine = true,
+                placeholder = "留空 = 无截止 · 可填「明天」「周五」「11/20」",
                 modifier = Modifier.weight(1f)
             )
         }
-        hint?.let { Text(it, fontSize = 11.sp, color = YinjiColors.Primary, modifier = Modifier.padding(top = 4.dp)) }
-        Spacer(Modifier.height(8.dp))
-        TextField(
+        hint?.let {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 6.dp)
+            ) {
+                Box(Modifier.size(6.dp).clip(CircleShape).background(YinjiColors.Primary))
+                Spacer(Modifier.width(6.dp))
+                Text(it, fontSize = 12.sp, color = YinjiColors.PrimaryDark, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        CuteTextField(
             value = time,
             onValueChange = { time = it },
-            placeholder = { Text("时间（可选，如 09:30）", fontSize = 12.sp) },
-            singleLine = true,
+            placeholder = "时间（可选，如 09:30）",
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))

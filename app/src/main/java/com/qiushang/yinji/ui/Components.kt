@@ -313,14 +313,28 @@ fun YDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .shadow(10.dp, YinjiShapes.Dialog)
+                .shadow(12.dp, YinjiShapes.Dialog)
                 .clip(YinjiShapes.Dialog)
                 .background(YinjiColors.Surface)
-                .border(1.dp, YinjiColors.Line, YinjiShapes.Dialog)
-                .padding(20.dp)
+                .border(2.dp, YinjiColors.MintLight, YinjiShapes.Dialog)
         ) {
+            // 顶部「手账胶带」：四色糖果条，随圆角一起裁切
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .height(9.dp)
+                    .align(Alignment.TopCenter)
+            ) {
+                Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Primary))
+                Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Cream))
+                Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Peach))
+                Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.MintLight))
+            }
             Column(
-                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 28.dp, bottom = 20.dp)
+                    .verticalScroll(rememberScrollState()),
                 content = content
             )
         }
@@ -328,9 +342,61 @@ fun YDialog(onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) 
 }
 
 @Composable
-fun DialogTitle(text: String) {
-    Text(text, fontSize = 19.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
-    Spacer(Modifier.height(14.dp))
+fun DialogTitle(text: String, buddy: Boolean = true) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (buddy) {
+            SproutBuddy(modifier = Modifier.size(42.dp), color = YinjiColors.Primary)
+            Spacer(Modifier.width(10.dp))
+        }
+        Text(text, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+    }
+    Spacer(Modifier.height(16.dp))
+}
+
+/** 统一的可爱输入框：全圆角暖奶油底、柔化下划线，四屏弹层共用。 */
+@Composable
+fun CuteTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    singleLine: Boolean = true,
+    minLines: Int = 1,
+    leadingIcon: @Composable (() -> Unit)? = null
+) {
+    androidx.compose.material3.TextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(placeholder, fontSize = 13.sp, color = YinjiColors.Muted) },
+        leadingIcon = leadingIcon,
+        singleLine = singleLine,
+        minLines = minLines,
+        modifier = modifier,
+        shape = YinjiShapes.Small,
+        colors = androidx.compose.material3.TextFieldDefaults.colors(
+            focusedContainerColor = YinjiColors.Field,
+            unfocusedContainerColor = YinjiColors.Field,
+            disabledContainerColor = YinjiColors.Field,
+            focusedTextColor = YinjiColors.Ink,
+            unfocusedTextColor = YinjiColors.Ink,
+            focusedPlaceholderColor = YinjiColors.Muted,
+            unfocusedPlaceholderColor = YinjiColors.Muted,
+            cursorColor = YinjiColors.Primary,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            disabledIndicatorColor = Color.Transparent
+        )
+    )
+}
+
+/** 带彩色小圆点的分节标签，替换弹层里干巴巴的灰色小字。 */
+@Composable
+fun SectionLabel(text: String, dotColor: Color = YinjiColors.Primary) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Box(Modifier.size(8.dp).clip(CircleShape).background(dotColor))
+        Spacer(Modifier.width(7.dp))
+        Text(text, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+    }
 }
 
 @Composable

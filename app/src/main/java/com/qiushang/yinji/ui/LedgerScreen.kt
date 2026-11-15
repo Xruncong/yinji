@@ -21,7 +21,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -322,26 +321,26 @@ private fun AddTransactionDialog(
         }
         Spacer(Modifier.height(10.dp))
 
-        TextField(
+        CuteTextField(
             value = note,
             onValueChange = { note = it },
-            placeholder = { Text("备注（可选）", fontSize = 12.sp) },
-            singleLine = true,
+            placeholder = "备注（可选）",
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(4.dp))
-        TextField(
+        Spacer(Modifier.height(8.dp))
+        CuteTextField(
             value = dateText,
             onValueChange = { dateText = it },
-            placeholder = { Text("日期（今天 / 明天 / 周三 / 2026-11-13）", fontSize = 11.sp) },
-            singleLine = true,
+            placeholder = "日期（今天 / 明天 / 周三 / 2026-11-13）",
             modifier = Modifier.fillMaxWidth()
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("今天", fontSize = 11.sp, color = YinjiColors.Primary,
-                modifier = Modifier.clickable { dateText = "今天" })
-            Text("昨天", fontSize = 11.sp, color = YinjiColors.Primary,
-                modifier = Modifier.clickable { dateText = Dates.str(Dates.today().minusDays(1)) })
+        Spacer(Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            Chip("今天", false, { dateText = "今天" }, baseColor = YinjiColors.PrimaryDark)
+            Chip("昨天", false, {
+                dateText = Dates.str(Dates.today().minusDays(1))
+            }, baseColor = YinjiColors.CandyGold)
+            Spacer(Modifier.width(4.dp))
             Text(
                 if (dateValid) "→ ${Dates.friendlyDate(parsedDate!!)}" else "日期无法识别",
                 fontSize = 11.sp,

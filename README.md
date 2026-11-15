@@ -90,6 +90,16 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - 待办三分段、备忘 `#标签` 上糖果色（青绿 / 奶油黄 / 蜜桃粉，选中态压深保证白字可读）。
 - 验收：零警告编译；Android 14 模拟器四屏 + 空态 + 记一笔弹层截图复看；`impeccable detect` 零违规。
 
+### v1.3 新建/编辑弹层可爱化
+
+用户反馈「各页新建页面太丑」后统一重做四个弹层，功能逻辑仍未动。改的是**共用底座**（一处改动，四屏与确认框一起受益），不是逐屏补妆：
+
+- `YDialog`：纯白方块 → 顶部四色「手账胶带」（薄荷绿 / 奶油黄 / 蜜桃粉 / 浅薄荷）+ 2dp 薄荷描边 + 更大圆角与柔和阴影。
+- `DialogTitle`：光秃秃一行字 → `SproutBuddy` 笑脸小芽吉祥物 + 20sp 粗标题（`buddy = false` 可关，用于标题已带 emoji 的习惯详情）。
+- 新增 `CuteTextField` 统一所有输入框：暖奶油 `Field` 底、14dp 圆角、无下划线、薄荷光标、可带 leadingIcon（备忘搜索框用它）；四页原来 9 个裸 `TextField` 全部替换，记一笔的备注/日期也一并统一。
+- 新增 `SectionLabel`：彩色小圆点 + 粗体分节标签，替换「图标 / 周期 / 截止」等灰小字；emoji 选择、周期按钮、日期快捷（今天/昨天）换成描边圆章与糖果胶囊。
+- 验收：零警告编译；Android 14 模拟器逐个打开新建习惯 / 记一笔 / 新建待办 / 编辑备忘弹层截图复看；`impeccable detect` 零违规。
+
 ## 状态（v1 已完成）
 
 四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。

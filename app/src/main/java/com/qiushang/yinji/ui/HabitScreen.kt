@@ -23,7 +23,6 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Spa
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -265,42 +264,48 @@ private fun HabitEditDialog(
     }
     YDialog(onDismiss = onDismiss) {
         DialogTitle(if (initial == null) "新建习惯" else "编辑习惯")
-        TextField(
+        CuteTextField(
             value = name,
             onValueChange = { name = it },
-            placeholder = { Text("想养成什么习惯？", fontSize = 13.sp) },
-            singleLine = true,
+            placeholder = "想养成什么习惯？",
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(Modifier.height(12.dp))
-        Text("图标", fontSize = 12.sp, color = YinjiColors.Muted)
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(14.dp))
+        SectionLabel("选个小图标", YinjiColors.Peach)
+        Spacer(Modifier.height(8.dp))
         EMOJI_CHOICES.chunked(5).forEach { row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 row.forEach { e ->
+                    val on = emoji == e
                     Box(
                         Modifier
-                            .size(34.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(if (emoji == e) YinjiColors.PrimarySoft else YinjiColors.Page)
+                            .background(if (on) YinjiColors.PrimarySoft else YinjiColors.Page)
+                            .border(
+                                if (on) 2.dp else 1.dp,
+                                if (on) YinjiColors.Primary else YinjiColors.Line,
+                                CircleShape
+                            )
                             .clickable { emoji = e },
                         contentAlignment = Alignment.Center
-                    ) { Text(e, fontSize = 16.sp) }
+                    ) { Text(e, fontSize = 17.sp) }
                 }
             }
             Spacer(Modifier.height(6.dp))
         }
-        Spacer(Modifier.height(6.dp))
-        Text("周期", fontSize = 12.sp, color = YinjiColors.Muted)
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(10.dp))
+        SectionLabel("每周哪几天", YinjiColors.CandyGold)
+        Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             (1..7).forEach { d ->
                 val selected = if (days.isEmpty()) false else d in days
                 Box(
                     Modifier
                         .weight(1f)
-                        .clip(YinjiShapes.Small)
+                        .clip(YinjiShapes.Pill)
                         .background(if (selected) YinjiColors.Primary else YinjiColors.PrimarySoft)
+                        .border(1.dp, if (selected) YinjiColors.PrimaryDark else YinjiColors.MintLight, YinjiShapes.Pill)
                         .clickable {
                             days = if (d in days) days - d else days + d
                         }
@@ -308,14 +313,15 @@ private fun HabitEditDialog(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(WEEK_LABELS[d - 1], fontSize = 12.sp,
-                        color = if (selected) Color.White else YinjiColors.PrimaryDark)
+                        color = if (selected) Color.White else YinjiColors.PrimaryDark,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
                 }
             }
         }
         Text(
-            if (days.isEmpty()) "不勾选 = 每天" else "只在上勾选的日子提醒打卡",
+            if (days.isEmpty()) "🌱 不勾选 = 每天都打卡" else "只在上勾选的日子提醒打卡",
             fontSize = 11.sp, color = YinjiColors.Muted,
-            modifier = Modifier.padding(top = 6.dp)
+            modifier = Modifier.padding(top = 8.dp)
         )
         Spacer(Modifier.height(16.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -350,7 +356,7 @@ private fun HabitDetailDialog(
     val stat = HabitStatsCalculator.stats(habit, doneDates, today)
 
     YDialog(onDismiss = onDismiss) {
-        DialogTitle("${habit.emoji} ${habit.name}")
+        DialogTitle("${habit.emoji} ${habit.name}", buddy = false)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
             StatCell("当前连续", "${stat.currentStreak} 天")
             StatCell("最长连续", "${stat.longestStreak} 天")

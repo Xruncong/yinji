@@ -20,7 +20,6 @@ import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -72,12 +71,13 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
 
             // 一行输入（flomo 风格）
             Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                TextField(
+                CuteTextField(
                     value = input,
                     onValueChange = { input = it },
-                    placeholder = { Text("一句话记下来，可用 #标签", fontSize = 12.sp) },
+                    placeholder = "一句话记下来，可用 #标签",
                     modifier = Modifier.weight(1f),
-                    maxLines = 2
+                    singleLine = false,
+                    minLines = 2
                 )
                 Spacer(Modifier.width(8.dp))
                 Box(
@@ -97,19 +97,16 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             }
 
             Spacer(Modifier.height(10.dp))
-            TextField(
+            CuteTextField(
                 value = query,
                 onValueChange = { query = it },
-                placeholder = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Rounded.Search, contentDescription = null,
-                                tint = YinjiColors.Muted, modifier = Modifier.size(15.dp))
-                            Spacer(Modifier.width(6.dp))
-                            Text("搜索正文或 #标签", fontSize = 12.sp)
-                        }
-                    },
+                placeholder = "搜索正文或 #标签",
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                leadingIcon = {
+                    Icon(Icons.Rounded.Search, contentDescription = null,
+                        tint = YinjiColors.Muted, modifier = Modifier.size(17.dp))
+                }
             )
 
             SectionTitle("共 ${visible.size} 条")
@@ -176,7 +173,14 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         var text by remember { mutableStateOf(n.text) }
         YDialog(onDismiss = { editing = null }) {
             DialogTitle("编辑备忘")
-            TextField(value = text, onValueChange = { text = it }, modifier = Modifier.fillMaxWidth(), minLines = 3)
+            CuteTextField(
+                value = text,
+                onValueChange = { text = it },
+                placeholder = "记点什么…可用 #标签",
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = false,
+                minLines = 3
+            )
             Spacer(Modifier.height(14.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 GhostButton("删除", onClick = { confirmDelete = n; editing = null })
