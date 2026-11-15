@@ -119,6 +119,16 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - **原型 `prototype/index.html` 同步**：CSS、内联 `widgetHTML()`、静态首屏兜底三处一起换成同款（四色胶带 + 内联笑脸小芽 SVG + 圆点分节 + 空心圈），`yinji-prototype.html` 保持 SHA256 一致；`node --check` 通过、Edge 渲染实读正常。
 - **验收**：零警告编译；Android 14 模拟器用 `input draganddrop` 真正把 4×2 卡片放置到 Launcher3 桌面（`dumpsys appwidget` 出现 `[1] id=6 provider=...YinjiWidgetReceiver`），截图实读样式与概念图一致；点空心圆圈 → sqlite 新增 `1|2026-11-15|` 完成记录且卡片上该习惯与「今日习惯」分节一起消失（查询过滤生效）；`impeccable detect` 零违规。
 
+### v1.6 豆包动画小猫做进 App（会动的角色）
+
+用户要求「动画也让它画，用它做的做进 app 里」——不再用代码自绘小芽，改用**豆包生成的简笔画小猫真帧**做吉祥物，在 App 内逐帧播放。角色设定图 [`docs/ui-concept-cat.png`](docs/ui-concept-cat.png)、动画帧序列图 [`docs/ui-concept-cat-anim.png`](docs/ui-concept-cat-anim.png)（4×2=8 格同一只猫的呼吸/摆尾/眨眼相位），提示词见 [`docs/doubao-prompt-cat-anim.txt`](docs/doubao-prompt-cat-anim.txt)。
+
+- **切帧**：`_debug/slice_cat.py`（Pillow）按 4×2 等分切 8 格、去水印、近白像素转透明（阈值 243 保住蜜桃粉腮红）、居中到 220×240 透明画布，双写 `docs/cat_frames/` 与 `app/src/main/res/drawable/cat_01..08.png`；另生成紧凑裁切的 `widget_cat.png` 供小组件用。
+- **App 内会动**：`SproutBuddy` 签名不变（`modifier` + `color`），实现从「Canvas 自绘小芽」换成 `LaunchedEffect` + 130ms/帧循环切换 8 张 `painterResource`，今日进度卡、记账环形图中心、空态插画、打卡卡、弹层标题等所有调用点一行未改即全部换成会动的豆包猫。
+- **小组件同步**：`YinjiWidget.kt` 标题行与空态的图标从 `widget_sprout` 换成 `widget_cat`（Glance 是静态 RemoteViews，用单帧静态猫；逐帧动画只在 Compose 内）。
+- **可分享资产**：8 帧合成 [`docs/cat-live.gif`](docs/cat-live.gif) / [`docs/cat-live.mp4`](docs/cat-live.mp4)（8fps 循环）。
+- **验收**：零警告编译；模拟器装后冷启动无崩溃，控件树确认两处「小猫同学」渲染；两帧间隔 260ms 像素差 2860 像素证明动画真在跑；一次真实写库触发 `Repository.refreshWidget()` 的 `updateAll` 后桌面卡片正确重建并显示豆包猫（四色胶带 + 右上角线稿小猫）；`impeccable detect` 零违规。
+
 ### 会动的小猫（独立互动演示）
 
 [`prototype/sprout-live.html`](prototype/sprout-live.html) 是单文件、双击即玩的简笔画小猫互动演示，与 App 工程相互独立（不改动任何 Kotlin 代码）；配套导出的 [`docs/sprout-live.gif`](docs/sprout-live.gif) 与 [`docs/sprout-live.mp4`](docs/sprout-live.mp4) 是可直接分享的动图/视频资产。

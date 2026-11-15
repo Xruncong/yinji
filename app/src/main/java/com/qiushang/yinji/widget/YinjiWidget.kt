@@ -258,8 +258,8 @@ private fun WidgetContent(snapshot: WidgetSnapshot) {
                     )
                 }
                 Image(
-                    provider = ImageProvider(R.drawable.widget_sprout),
-                    contentDescription = "小芽",
+                    provider = ImageProvider(R.drawable.widget_cat),
+                    contentDescription = "小猫同学",
                     modifier = GlanceModifier.size(34.dp)
                 )
             }
@@ -271,8 +271,8 @@ private fun WidgetContent(snapshot: WidgetSnapshot) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
-                        provider = ImageProvider(R.drawable.widget_sprout),
-                        contentDescription = "小芽",
+                        provider = ImageProvider(R.drawable.widget_cat),
+                        contentDescription = "小猫同学",
                         modifier = GlanceModifier.size(28.dp)
                     )
                     Spacer(GlanceModifier.width(8.dp))

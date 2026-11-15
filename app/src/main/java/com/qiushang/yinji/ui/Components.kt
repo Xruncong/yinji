@@ -1,6 +1,7 @@
 package com.qiushang.yinji.ui
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -32,6 +33,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,14 +48,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.window.Dialog
+import com.qiushang.yinji.R
 import com.qiushang.yinji.ui.theme.YinjiColors
 import com.qiushang.yinji.ui.theme.YinjiShapes
+import kotlinx.coroutines.isActive
 
 /** 软糖卡片：白底 + 大圆角 + 极柔阴影 + 奶油色细描边，不用 M3 Card 的默认值。 */
 @Composable
@@ -96,67 +106,33 @@ fun Sprout(modifier: Modifier = Modifier, color: Color = YinjiColors.PrimaryDark
 }
 
 /**
- * 手账吉祥物「小芽同学」：圆脑袋 + 两片叶 + 笑脸 + 腮红 + 漂浮小圆点。
- * 纯 Canvas 自绘，用于空态插画、环形图中心等，缩放不失真、不依赖图片资源。
+ * 吉祥物「小猫同学」：由豆包绘制的 8 帧简笔画小猫（呼吸 / 摆尾 / 眨眼）循环播放。
+ * 帧图来自 docs/ui-concept-cat-anim.png 切帧，落在 res/drawable/cat_01..08.png。
+ * 签名与旧版 SproutBuddy 完全一致（modifier + color），所有调用点无需改动；
+ * color 参数保留以兼容旧调用，帧图自带深墨绿线条与蜜桃粉腮红，故不参与着色。
  */
 @Composable
 fun SproutBuddy(modifier: Modifier = Modifier, color: Color = YinjiColors.Primary) {
-    Canvas(modifier = modifier) {
-        val w = size.width
-        val h = size.height
-        val cx = w / 2f
-        val headR = w * 0.28f
-        val headCy = h * 0.60f
-
-        // 漂浮的小圆点（奶油黄 / 蜜桃粉 / 薄荷）
-        drawOval(YinjiColors.Cream.copy(alpha = 0.9f),
-            Offset(w * 0.09f, h * 0.30f), Size(w * 0.06f, w * 0.06f))
-        drawOval(YinjiColors.Peach.copy(alpha = 0.9f),
-            Offset(w * 0.85f, h * 0.22f), Size(w * 0.05f, w * 0.05f))
-        drawOval(YinjiColors.MintLight,
-            Offset(w * 0.87f, h * 0.56f), Size(w * 0.04f, w * 0.04f))
-
-        // 两片圆叶
-        val lw = w * 0.30f
-        val lh = h * 0.14f
-        val leafBaseY = headCy - headR * 0.82f
-        rotate(38f, Offset(cx, leafBaseY)) {
-            drawOval(color, Offset(cx - lw, leafBaseY - lh), Size(lw, lh))
-        }
-        rotate(-38f, Offset(cx, leafBaseY)) {
-            drawOval(color.copy(alpha = 0.82f), Offset(cx, leafBaseY - lh), Size(lw, lh))
-        }
-
-        // 圆脑袋：外圈浅色光晕 + 实心
-        drawOval(color.copy(alpha = 0.18f),
-            Offset(cx - headR * 1.10f, headCy - headR * 1.10f),
-            Size(headR * 2.20f, headR * 2.20f))
-        drawOval(color, Offset(cx - headR, headCy - headR), Size(headR * 2f, headR * 2f))
-
-        // 眼睛
-        val eyeR = headR * 0.11f
-        val eyeY = headCy - headR * 0.14f
-        drawOval(Color.White, Offset(cx - headR * 0.42f - eyeR, eyeY - eyeR), Size(eyeR * 2, eyeR * 2))
-        drawOval(Color.White, Offset(cx + headR * 0.42f - eyeR, eyeY - eyeR), Size(eyeR * 2, eyeR * 2))
-
-        // 腮红
-        drawOval(YinjiColors.Peach.copy(alpha = 0.7f),
-            Offset(cx - headR * 0.74f, eyeY + headR * 0.30f), Size(headR * 0.26f, headR * 0.15f))
-        drawOval(YinjiColors.Peach.copy(alpha = 0.7f),
-            Offset(cx + headR * 0.48f, eyeY + headR * 0.30f), Size(headR * 0.26f, headR * 0.15f))
-
-        // 微笑弧
-        val smileW = headR * 0.78f
-        drawArc(
-            color = Color.White,
-            startAngle = 10f,
-            sweepAngle = 160f,
-            useCenter = false,
-            topLeft = Offset(cx - smileW / 2f, eyeY + headR * 0.06f),
-            size = Size(smileW, headR * 0.72f),
-            style = Stroke(width = (headR * 0.10f).coerceAtLeast(1.5f), cap = StrokeCap.Round)
+    val frames = remember {
+        intArrayOf(
+            R.drawable.cat_01, R.drawable.cat_02, R.drawable.cat_03, R.drawable.cat_04,
+            R.drawable.cat_05, R.drawable.cat_06, R.drawable.cat_07, R.drawable.cat_08
         )
     }
+    var index by remember { mutableIntStateOf(0) }
+    LaunchedEffect(Unit) {
+        // 8 帧 × 130ms ≈ 1s 一个待机循环；LaunchedEffect 随 composition 退出自动取消。
+        while (isActive) {
+            kotlinx.coroutines.delay(130)
+            index = (index + 1) % frames.size
+        }
+    }
+    Image(
+        painter = painterResource(frames[index]),
+        contentDescription = "小猫同学",
+        modifier = modifier,
+        contentScale = ContentScale.Fit
+    )
 }
 
 /** 柔和彩色圆底 + emoji 的分类图标，替换原来过淡的方块底。 */
