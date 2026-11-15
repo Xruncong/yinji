@@ -111,6 +111,14 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - **数据层**：新增 `clock_in` 表（`(date, type)` 联合主键，一天最多上班/下班两条），Room `version=1 → 2` 用**显式 `MIGRATION_1_2`** 保留真机旧数据；导出/恢复 JSON 增加第 6 张表（`BackupCodec.VERSION` 仍 1，旧备份缺键自动空数组向后兼容）；纯本地、不联网、无会员墙、不引新依赖。
 - 验收：零警告编译；Android 14 模拟器逐链路实测——打卡卡渲染、两条打卡写库（`2026-11-15|on|03:47` / `off`）、统计热力图、提醒设置、`dumpsys alarm` 确认两个闹钟已排、以 App 自身 UID 触发到点通知（`NotificationRecord id=1001` / `channel=clock_in_reminder` / `actions=2`）、点「已打卡」按钮写库成功且通知撤除；`impeccable detect` 零违规。
 
+### v1.5 桌面小组件视觉统一（原型 + 真机卡片）
+
+用户反馈「原型里的小组件和真机/概念图不一样」，要求原型与 App 都对齐豆包概念图。概念图见 [`docs/ui-concept-widget.png`](docs/ui-concept-widget.png)，提示词见 [`docs/doubao-prompt-widget.txt`](docs/doubao-prompt-widget.txt)。
+
+- **真机 Glance 卡片重写**：奶白软糖卡（外层奶油描边 + 内层奶白双层模拟圆角/细描边）、顶部四色手账胶带、标题行笑脸小芽（`res/drawable/widget_sprout.xml` 自绘 vector）、蜜桃粉/奶油黄圆点分节、薄荷空心圆勾选框（`widget_circle.xml`）、「勾掉即消失」仍靠 `Repository.widgetSnapshot()` 只返回未完成项过滤，点击走 `ActionCallback` 写库 + `update` 刷新。Glance 1.1.1 无 border/shadow/Canvas，故用 vector drawable + 双层 background 实现。
+- **原型 `prototype/index.html` 同步**：CSS、内联 `widgetHTML()`、静态首屏兜底三处一起换成同款（四色胶带 + 内联笑脸小芽 SVG + 圆点分节 + 空心圈），`yinji-prototype.html` 保持 SHA256 一致；`node --check` 通过、Edge 渲染实读正常。
+- **验收**：零警告编译；Android 14 模拟器用 `input draganddrop` 真正把 4×2 卡片放置到 Launcher3 桌面（`dumpsys appwidget` 出现 `[1] id=6 provider=...YinjiWidgetReceiver`），截图实读样式与概念图一致；点空心圆圈 → sqlite 新增 `1|2026-11-15|` 完成记录且卡片上该习惯与「今日习惯」分节一起消失（查询过滤生效）；`impeccable detect` 零违规。
+
 ## 状态（v1 已完成）
 
 四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。
@@ -125,7 +133,7 @@ schemas/                               Room 导出的 schema（KSP 生成）
 | 备忘 | `#标签` 抽取成 chip、正文搜索、置顶、编辑、删除 |
 | 待办 | 今天/全部/已完成分段、自然语言日期（`11/20`→`11 月 20 日 周五`）、逾期 `⚠ 已逾期` 标红、完成勾选 → 已完成「恢复」 |
 | 导出/恢复 | SAF 弹出 CreateDocument/OpenDocument，导出 JSON 2251B 结构正确，恢复后 5 表计数与明细一致（事务原子性验证通过） |
-| 桌面小卡片 | `dumpsys appwidget` 确认 `YinjiWidgetReceiver` provider 已注册 |
+| 桌面小卡片 | v1.5 起已在模拟器真实启动器放置 4×2 卡片并验证勾选写库+消失（`dumpsys appwidget` 有实例 `id=6`）；真机待秋殇手动放置 |
 
 调试中发现并修复的真实 bug：`NotesScreen` 空白输入可落库（`isNotBlank()` 与 `trim()` 判断不一致）、`importJson` 无事务可致数据全丢、`Money.parse` 浮点精度、`AddTransactionDialog` 日期不可改、`todayProgress` 未按 habitId 分组、`MainActivity` 在 composition 期间写 state。
 
