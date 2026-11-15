@@ -119,6 +119,14 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - **原型 `prototype/index.html` 同步**：CSS、内联 `widgetHTML()`、静态首屏兜底三处一起换成同款（四色胶带 + 内联笑脸小芽 SVG + 圆点分节 + 空心圈），`yinji-prototype.html` 保持 SHA256 一致；`node --check` 通过、Edge 渲染实读正常。
 - **验收**：零警告编译；Android 14 模拟器用 `input draganddrop` 真正把 4×2 卡片放置到 Launcher3 桌面（`dumpsys appwidget` 出现 `[1] id=6 provider=...YinjiWidgetReceiver`），截图实读样式与概念图一致；点空心圆圈 → sqlite 新增 `1|2026-11-15|` 完成记录且卡片上该习惯与「今日习惯」分节一起消失（查询过滤生效）；`impeccable detect` 零违规。
 
+### 会动的小芽（独立互动演示）
+
+[`prototype/sprout-live.html`](prototype/sprout-live.html) 是单文件、双击即玩的小芽互动演示，与 App 工程相互独立（不改动任何 Kotlin 代码）；配套导出的 [`docs/sprout-live.gif`](docs/sprout-live.gif) 与 [`docs/sprout-live.mp4`](docs/sprout-live.mp4) 是可直接分享的动图/视频资产。
+
+- **常驻动画**：呼吸缩放、上下浮动、叶片/茎摆动、周期性眨眼、微笑弧随进度微张、腮红脉冲、光晕呼吸、确定性漂浮粒子。
+- **互动**：点击浇水（三次长大、再点归零并撒花）、长按摸头（眯眼爱心）、拖拽甩一甩（眩晕 + 弹簧回弹）、双击哄睡/唤醒、戳脸/叶子/肚皮各有不同文案与特效、鼠标移动时眼睛会跟随、6 种按钮入口（浇水/摸头/睡觉/重来/4 种心情/可选音效）、键盘空格/Z/1-4/R/M 快捷键。
+- **验收**：playwright + Edge 真实指针事件逐项验证（含单击/双击/长按/拖拽），`JS_ERRORS 0`；`window.setFrame(i,total)` / `setProgress(p)` 确定性截帧接口保留，72 帧经 ffmpeg 合成 GIF/MP4，抽帧实读正常。互动态截图见 [`prototype/sprout-interactive.png`](prototype/sprout-interactive.png) / [`prototype/sprout-sleep.png`](prototype/sprout-sleep.png) / [`prototype/sprout-bloom.png`](prototype/sprout-bloom.png)。
+
 ## 状态（v1 已完成）
 
 四个功能屏、Glance 桌面小卡片、导出/恢复 UI 全部实现，`assembleDebug` 持续 BUILD SUCCESSFUL，产物 `app-debug.apk`（约 60MB，debug 签名）经 `aapt dump badging` 校验。

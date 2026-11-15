@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>印记 · 会动的小芽</title>
+<title>印记 · 会互动的小芽</title>
 <style>
   * { box-sizing: border-box; }
   html,body { height:100%; margin:0; }
@@ -13,24 +13,62 @@
                 #FBF8F1;
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
     color:#33564B; display:flex; align-items:center; justify-content:center;
-    overflow:hidden; cursor:pointer; user-select:none;
+    overflow:hidden; user-select:none;
   }
-  .stage { width:min(92vw, 900px); text-align:center; position:relative; }
+  .stage { width:min(94vw, 920px); text-align:center; position:relative; }
   h1 { font-size:15px; letter-spacing:.22em; color:#5E7C70; font-weight:600; margin:0 0 4px; }
-  .sub { font-size:12px; color:#8AA69B; margin:0 0 18px; letter-spacing:.08em; }
-  svg { display:block; margin:0 auto; overflow:visible; }
-  .hint { margin-top:10px; font-size:12px; color:#8AA69B; letter-spacing:.06em; }
+  .sub { font-size:12px; color:#8AA69B; margin:0 0 10px; letter-spacing:.08em; }
+  svg { display:block; margin:0 auto; overflow:visible; cursor:grab; touch-action:none; }
+  svg.grabbing { cursor:grabbing; }
+  .hint { margin-top:6px; font-size:12px; color:#8AA69B; letter-spacing:.06em; height:18px; }
   .pill {
-    display:inline-flex; align-items:center; gap:8px; margin-top:16px;
+    display:inline-flex; align-items:center; gap:8px; margin-top:10px;
     background:#fff; border:2px solid #EADFC6; border-radius:999px;
-    padding:8px 18px; font-size:13px; font-weight:700; color:#2A6F5B;
+    padding:7px 18px; font-size:13px; font-weight:700; color:#2A6F5B;
     box-shadow:0 6px 18px rgba(107,91,74,.10);
   }
   .pill b { font-size:16px; }
-  .dots { display:flex; gap:7px; justify-content:center; margin-top:14px; }
-  .dots i { width:7px; height:7px; border-radius:50%; background:#B7E7D6; display:block; }
+  .dots { display:flex; gap:7px; justify-content:center; margin-top:10px; }
+  .dots i { width:7px; height:7px; border-radius:50%; background:#B7E7D6; display:block; transition:.25s; }
   .dots i:nth-child(2){ background:#F7D98C; } .dots i:nth-child(3){ background:#F6B8AE; }
-  .float { position:absolute; border-radius:50%; pointer-events:none; }
+  .dots i.on { transform:scale(1.5); box-shadow:0 0 0 3px rgba(58,154,128,.14); }
+
+  .controls {
+    display:flex; flex-wrap:wrap; gap:7px; justify-content:center; align-items:center;
+    margin-top:14px;
+  }
+  .controls .sep { width:1px; height:20px; background:#EADFC6; margin:0 4px; }
+  button {
+    font-family:inherit; font-size:12px; font-weight:700; color:#2A6F5B;
+    background:#fff; border:2px solid #EADFC6; border-radius:999px;
+    padding:6px 13px; cursor:pointer; transition:.16s; white-space:nowrap;
+  }
+  button:hover { background:#E6F5EF; transform:translateY(-1px); }
+  button:active { transform:translateY(1px); }
+  button.on { background:#3A9A80; border-color:#3A9A80; color:#fff; }
+  .tips { margin-top:10px; font-size:11px; color:#9CB3A8; letter-spacing:.04em; line-height:1.7; }
+
+  #bubble {
+    position:absolute; left:50%; top:44px; transform:translate(-50%,6px) scale(.88);
+    background:#fff; border:2px solid #EADFC6; border-radius:999px;
+    padding:6px 15px; font-size:12px; font-weight:700; color:#2A6F5B;
+    box-shadow:0 6px 16px rgba(107,91,74,.12); opacity:0; transition:.22s;
+    white-space:nowrap; pointer-events:none; z-index:5;
+  }
+  #bubble.show { opacity:1; transform:translate(-50%,0) scale(1); }
+  #fx { position:absolute; inset:0; pointer-events:none; overflow:visible; z-index:4; }
+  .fx { position:absolute; font-size:20px; animation:floatUp 1.25s ease-out forwards; }
+  @keyframes floatUp {
+    0%   { opacity:0; transform:translateY(12px) scale(.6) rotate(-8deg); }
+    18%  { opacity:1; }
+    100% { opacity:0; transform:translateY(-96px) scale(1.2) rotate(10deg); }
+  }
+  /* 确定性截帧时隐藏交互控件，保证 GIF/MP4 画面与纯动画版一致 */
+  body.capture .controls, body.capture #bubble, body.capture #fx, body.capture .tips { display:none; }
+  body.capture .hint { margin-top:10px; }
+  body.capture .pill { margin-top:16px; }
+  body.capture .dots { margin-top:14px; }
+  body.capture .sub { margin-bottom:18px; }
 </style>
 </head>
 <body>
@@ -38,7 +76,9 @@
   <h1>印 记 · 小 芽</h1>
   <p class="sub">奶油薄荷 · 小芽生长</p>
 
-  <svg id="scene" width="360" height="330" viewBox="0 0 360 330" aria-label="会动的笑脸小芽">
+  <div id="bubble">你好呀～</div>
+
+  <svg id="scene" width="360" height="330" viewBox="0 0 360 330" aria-label="会互动的笑脸小芽">
     <defs>
       <radialGradient id="halo" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="#E6F5EF" stop-opacity=".95"/>
@@ -46,47 +86,48 @@
       </radialGradient>
     </defs>
 
-    <!-- 光晕 -->
     <circle id="halo" cx="180" cy="176" r="118" fill="url(#halo)"/>
-
-    <!-- 漂浮小圆点 -->
     <g id="particles"></g>
-
-    <!-- 浇水水滴（点击时） -->
     <g id="drops"></g>
 
-    <!-- 小芽整体 -->
     <g id="buddy">
-      <!-- 茎 -->
       <path id="stem" d="M180 118 L180 84" stroke="#2A6F5B" stroke-width="6" stroke-linecap="round" fill="none"/>
-      <!-- 左叶 -->
-      <g id="leafL">
+      <g id="leafL" data-zone="leaf">
         <ellipse cx="158" cy="76" rx="24" ry="13" fill="#3A9A80" transform="rotate(-32 158 76)"/>
       </g>
-      <!-- 右叶 -->
-      <g id="leafR">
+      <g id="leafR" data-zone="leaf">
         <ellipse cx="202" cy="76" rx="24" ry="13" fill="#6FC4A6" transform="rotate(32 202 76)"/>
       </g>
-      <!-- 脸 -->
-      <circle cx="180" cy="184" r="66" fill="#FFF7E8" stroke="#EADFC6" stroke-width="3.5"/>
-      <!-- 腮红 -->
+
+      <circle id="face" data-zone="face" cx="180" cy="184" r="66" fill="#FFF7E8" stroke="#EADFC6" stroke-width="3.5"/>
+
       <g id="blush">
         <ellipse cx="142" cy="196" rx="10" ry="5.5" fill="#F6B8AE" opacity=".85"/>
         <ellipse cx="218" cy="196" rx="10" ry="5.5" fill="#F6B8AE" opacity=".85"/>
       </g>
-      <!-- 眼睛 -->
-      <g id="eyes">
-        <circle cx="158" cy="178" r="5" fill="#33564B"/>
-        <circle cx="202" cy="178" r="5" fill="#33564B"/>
+
+      <g id="eyeDots">
+        <circle id="eyeL" cx="158" cy="178" r="5" fill="#33564B"/>
+        <circle id="eyeR" cx="202" cy="178" r="5" fill="#33564B"/>
       </g>
-      <!-- 微笑 -->
-      <path id="smile" d="M164 202 Q180 216 196 202" stroke="#33564B" stroke-width="4"
-            stroke-linecap="round" fill="none"/>
-      <!-- 高光 -->
-      <ellipse cx="152" cy="152" rx="16" ry="9" fill="#fff" opacity=".55" transform="rotate(-28 152 152)"/>
+      <g id="eyeArcs" opacity="0" fill="none" stroke="#33564B" stroke-width="3.5" stroke-linecap="round">
+        <path id="arcL" d="M148 178 Q158 187 168 178"/>
+        <path id="arcR" d="M192 178 Q202 187 212 178"/>
+      </g>
+      <g id="eyeX" opacity="0" stroke="#33564B" stroke-width="3" stroke-linecap="round" fill="none">
+        <path d="M152 172 L165 185 M165 172 L152 185"/>
+        <path d="M195 172 L208 185 M208 172 L195 185"/>
+      </g>
+
+      <ellipse id="mouthO" cx="180" cy="206" rx="6.5" ry="8.5" fill="none" stroke="#33564B" stroke-width="3.5" opacity="0"/>
+      <path id="smile" d="M164 202 Q180 216 196 202" stroke="#33564B" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <ellipse id="hl" cx="152" cy="152" rx="16" ry="9" fill="#fff" opacity=".55" transform="rotate(-28 152 152)"/>
+
+      <circle data-zone="cheek" cx="145" cy="196" r="16" fill="transparent" pointer-events="all"/>
+      <circle data-zone="cheek" cx="215" cy="196" r="16" fill="transparent" pointer-events="all"/>
+      <circle data-zone="tummy" cx="180" cy="222" r="18" fill="transparent" pointer-events="all"/>
     </g>
 
-    <!-- 小爪子（弹跳时露出） -->
     <g id="feet" opacity="0">
       <ellipse cx="150" cy="248" rx="11" ry="6" fill="#3A9A80"/>
       <ellipse cx="210" cy="248" rx="11" ry="6" fill="#3A9A80"/>
@@ -95,19 +136,38 @@
 
   <div class="hint" id="hint">点一下给它浇水 🌱</div>
   <div class="pill">今日进度 <b id="count">0 / 3</b></div>
-  <div class="dots"><i></i><i></i><i></i></div>
+  <div class="dots" id="dots"><i></i><i></i><i></i></div>
+
+  <div class="controls" id="controls">
+    <button id="btnWater">💧 浇水</button>
+    <button id="btnPet">🤚 摸摸头</button>
+    <button id="btnSleep">💤 睡觉</button>
+    <button id="btnReset">🔄 重来</button>
+    <span class="sep"></span>
+    <button data-mood="happy" class="on">开心</button>
+    <button data-mood="surprised">惊喜</button>
+    <button data-mood="shy">害羞</button>
+    <button data-mood="sleepy">困困</button>
+    <span class="sep"></span>
+    <button id="btnSound">🔇 音效</button>
+  </div>
+  <div class="tips">点一下浇水 · 长按摸摸头 · 拖动甩一甩 · 双击哄睡觉 · 戳脸/叶子有反应 · 鼠标动它会看你<br>键盘：空格浇水 / Z 睡觉 / 1-4 换心情 / R 重来</div>
+
+  <div id="fx"></div>
 </div>
 
 <script>
 (function(){
   'use strict';
   var $ = function(id){ return document.getElementById(id); };
-  var buddy=$('buddy'), leafL=$('leafL'), leafR=$('leafR'), eyes=$('eyes'),
-      blush=$('blush'), smile=$('smile'), stem=$('stem'), halo=$('halo'),
-      feet=$('feet'), particles=$('particles'), drops=$('drops'),
-      countEl=$('count'), hint=$('hint'), stage=$('stage');
+  var buddy=$('buddy'), leafL=$('leafL'), leafR=$('leafR'), eyeDots=$('eyeDots'),
+      eyeL=$('eyeL'), eyeR=$('eyeR'), eyeArcs=$('eyeArcs'), arcL=$('arcL'), arcR=$('arcR'),
+      eyeX=$('eyeX'), mouthO=$('mouthO'), blush=$('blush'), smile=$('smile'), stem=$('stem'),
+      halo=$('halo'), feet=$('feet'), particles=$('particles'), drops=$('drops'),
+      countEl=$('count'), hint=$('hint'), stage=$('stage'), scene=$('scene'),
+      bubble=$('bubble'), fx=$('fx'), dots=$('dots');
 
-  // 生成漂浮粒子（确定性位置）
+  // ---------- 确定性粒子/水滴 ----------
   var P=[], rnd=function(i){ var x=Math.sin(i*127.1+3.7)*43758.5453; return x-Math.floor(x); };
   for(var i=0;i<9;i++){
     var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
@@ -119,7 +179,6 @@
     particles.appendChild(c);
     P.push({el:c, x:px, y:py, ph:rnd(i+120)*6.28, sp:.5+rnd(i+160)*.7, amp:6+rnd(i+200)*8});
   }
-  // 水滴
   var D=[];
   for(var j=0;j<5;j++){
     var d=document.createElementNS('http://www.w3.org/2000/svg','path');
@@ -129,93 +188,373 @@
     D.push({el:d, x:180+(j-2)*20, off:j*.12});
   }
 
-  var progress=0, popT=-1, popX=180, popY=180, running=true, t0=0;
+  // ---------- 状态 ----------
+  var S = {
+    progress:0, mood:'happy', moodUntil:0, sleeping:false,
+    popT:-1, petT:-1, winkUntil:0, dizzyUntil:0, leafWiggle:0, giggle:0,
+    eyesX:0, eyesY:0, dragOff:{x:0,y:0,rot:0}, drag:null,
+    running:true, frozen:false, t0:0, sound:false, bubbleUntil:0,
+    faceMood:'happy'
+  };
 
+  var LINES = {
+    water:['咕嘟咕嘟～','又长高一点点！','今天也要加油呀','谢谢你的水 💧'],
+    leaf:['别揪叶子呀～','痒痒！','叶子会掉的啦'],
+    cheek:['嘿嘿～','被你戳到啦','好害羞…'],
+    tummy:['呀！痒痒！','咯咯咯～','别戳肚肚'],
+    pet:['好舒服呀～','再摸摸～','最喜欢你了 ♡'],
+    drag:['晕乎乎…','慢一点啦！','转圈圈～'],
+    sleep:['困了…Zzz','晚安 🌙','呼…呼…'],
+    wake:['醒啦！','啊，睡过头了','精神满满 ✨'],
+    bloom:['长满啦，好棒！🎉','开花咯 🌸','谢谢你陪我长大'],
+    reset:['再长一次！','从头开始咯','准备好啦～'],
+    mood:{happy:['今天心情超好！'],surprised:['哇！吓一跳'],shy:['别、别看我…'],sleepy:['有点困了…']}
+  };
+  function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function say(text, ms){
+    bubble.textContent = text; bubble.classList.add('show');
+    S.bubbleUntil = performance.now() + (ms||1500);
+  }
+  function setHint(t){ hint.textContent = t; }
+
+  // ---------- 音效（可选，默认关） ----------
+  var actx=null;
+  function blip(freq, dur){
+    if(!S.sound) return;
+    try{
+      actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+      var o=actx.createOscillator(), g=actx.createGain();
+      o.type='sine'; o.frequency.value=freq;
+      g.gain.setValueAtTime(.0001, actx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.07, actx.currentTime+.015);
+      g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime+(dur||.16));
+      o.connect(g); g.connect(actx.destination);
+      o.start(); o.stop(actx.currentTime+(dur||.16)+.02);
+    }catch(e){}
+  }
+
+  // ---------- 漂浮表情 ----------
+  function floatEmoji(ch, x, y, n){
+    n = n || 1;
+    for(var i=0;i<n;i++){
+      (function(k){
+        setTimeout(function(){
+          var e=document.createElement('span');
+          e.className='fx'; e.textContent=ch;
+          e.style.left=(x+(Math.random()-0.5)*60)+'px';
+          e.style.top =(y+(Math.random()-0.5)*24)+'px';
+          fx.appendChild(e);
+          setTimeout(function(){ e.remove(); },1300);
+        }, k*110);
+      })(i);
+    }
+  }
+  function fxPos(e){
+    var r=stage.getBoundingClientRect();
+    return { x:(e.clientX!=null?e.clientX:180)-r.left, y:(e.clientY!=null?e.clientY:180)-r.top };
+  }
+
+  // ---------- 表情渲染 ----------
+  function applyFace(t, blink){
+    var m = S.frozen ? 'happy' : S.faceMood;
+    var wink = !S.frozen && performance.now() < S.winkUntil;
+    var showDots = (m==='happy'||m==='surprised');
+    eyeDots.setAttribute('opacity', showDots?'1':'0');
+    eyeArcs.setAttribute('opacity', (m==='loved'||m==='shy'||m==='sleepy'||m==='sleep')?'1':'0');
+    eyeX.setAttribute('opacity', m==='dizzy'?'1':'0');
+    mouthO.setAttribute('opacity', (m==='surprised'||m==='sleep')?'1':'0');
+    smile.setAttribute('opacity', (m==='surprised'||m==='sleep')?'0':'1');
+
+    var r = m==='surprised' ? 7 : 5;
+    eyeL.setAttribute('r', r);
+    eyeR.setAttribute('r', wink ? 0.8 : r);
+    eyeDots.setAttribute('transform',
+      'translate('+S.eyesX.toFixed(2)+' '+S.eyesY.toFixed(2)+') '+
+      'translate(180 178) scale(1 '+blink.toFixed(3)+') translate(-180 -178)');
+
+    if(m==='sleep'||m==='sleepy'){
+      arcL.setAttribute('d','M148 180 Q158 173 168 180');
+      arcR.setAttribute('d','M192 180 Q202 173 212 180');
+    } else {
+      arcL.setAttribute('d','M148 177 Q158 187 168 177');
+      arcR.setAttribute('d','M192 177 Q202 187 212 177');
+    }
+    if(m==='shy'){
+      blush.setAttribute('opacity','1');
+      smile.setAttribute('d','M170 204 Q180 211 190 204');
+    } else {
+      smile.setAttribute('d', smilePath(t));
+    }
+  }
+  function smilePath(t){
+    var s3=Math.sin(t*Math.PI*2+1.6);
+    var lift=4+s3*1.6+S.progress*2;
+    return 'M164 '+(202-lift/2).toFixed(1)+' Q180 '+(216+lift).toFixed(1)+' 196 '+(202-lift/2).toFixed(1);
+  }
+
+  // ---------- 帧渲染（idle 动画 + 交互叠加；frozen 时与原版逐像素一致） ----------
   function frame(t){
-    // t: 归一化 0..1，循环周期 4s
     var s=Math.sin(t*Math.PI*2), s2=Math.sin(t*Math.PI*4+0.8), s3=Math.sin(t*Math.PI*2+1.6);
-    var grow=1+progress*0.11;
-    // 呼吸 + 上下浮动（弹跳叠加）
+    var grow=1+S.progress*0.11;
     var pop=0, popSq=1;
-    if(popT>=0){
-      var p=popT/0.55;
+    if(S.popT>=0){
+      var p=S.popT/0.55;
       if(p<1){ pop=-Math.sin(p*Math.PI)*16; popSq=1+Math.sin(p*Math.PI)*0.09; }
     }
     var breathe=1+(s2*0.018)*grow;
+    var d=S.dragOff;
     buddy.setAttribute('transform',
+      'translate('+d.x.toFixed(2)+' '+d.y.toFixed(2)+') rotate('+d.rot.toFixed(2)+' 180 184) '+
       'translate(180 184) scale('+(breathe*grow*popSq).toFixed(4)+') translate(-180 -184) '+
-      'translate(0 '+((s*3+pop)).toFixed(2)+')');
-    // 叶子摆动
-    leafL.setAttribute('transform','rotate('+(-32+s*7).toFixed(2)+' 180 84)');
-    leafR.setAttribute('transform','rotate('+(32-s*7).toFixed(2)+' 180 84)');
+      'translate(0 '+(s*3+pop).toFixed(2)+')');
+
+    var wig=S.frozen?0:S.leafWiggle;
+    leafL.setAttribute('transform','rotate('+(-32+s*7+wig*Math.sin(t*90)).toFixed(2)+' 180 84)');
+    leafR.setAttribute('transform','rotate('+(32-s*7-wig*Math.sin(t*90)).toFixed(2)+' 180 84)');
     stem.setAttribute('transform','rotate('+(s*2.5).toFixed(2)+' 180 118)');
-    // 眨眼：周期 4s 内两处短眨
+
     var bt=t*4 % 1;
-    var blink=(bt<0.035|| (bt>0.46&&bt<0.495)) ? 0.12 : 1;
-    eyes.setAttribute('transform','translate(180 178) scale(1 '+blink.toFixed(3)+') translate(-180 -178)');
-    // 微笑随进度/呼吸微张
-    var lift=4+s3*1.6+progress*2;
-    smile.setAttribute('d','M164 '+(202-lift/2).toFixed(1)+' Q180 '+(216+lift).toFixed(1)+' 196 '+(202-lift/2).toFixed(1));
-    // 腮红脉冲
+    var blink=(bt<0.035||(bt>0.46&&bt<0.495)) ? 0.12 : 1;
+    applyFace(t, blink);
+
     blush.setAttribute('opacity',(0.7+0.25*s3).toFixed(3));
-    // 光晕呼吸
-    halo.setAttribute('r',(112+s2*6+progress*8).toFixed(1));
-    // 小爪子：弹跳时露出
-    feet.setAttribute('opacity', popT>=0 ? '0.9' : '0');
-    // 漂浮粒子
+    halo.setAttribute('r',(112+s2*6+S.progress*8).toFixed(1));
+    feet.setAttribute('opacity', S.popT>=0 ? '0.9' : '0');
+
     for(var i=0;i<P.length;i++){
       var q=P[i], dy=Math.sin(t*Math.PI*2*q.sp+q.ph)*q.amp;
       q.el.setAttribute('cy',(q.y+dy).toFixed(1));
       q.el.setAttribute('cx',(q.x+Math.cos(t*Math.PI*2*q.sp*.6+q.ph)*3).toFixed(1));
     }
-    // 水滴（点击后 0~0.6 秒）
     for(var k=0;k<D.length;k++){
       var w=D[k];
-      if(popT>=0){
-        var lp=(popT-w.off)/0.5;
+      if(S.popT>=0){
+        var lp=(S.popT-w.off)/0.5;
         if(lp>0 && lp<1){
           w.el.setAttribute('opacity',(1-lp).toFixed(2));
-          w.el.setAttribute('transform','translate('+(w.x)+' '+(70+lp*70)+') scale('+(0.8+lp*0.5).toFixed(2)+')');
+          w.el.setAttribute('transform','translate('+w.x+' '+(70+lp*70)+') scale('+(0.8+lp*0.5).toFixed(2)+')');
         } else w.el.setAttribute('opacity','0');
       } else w.el.setAttribute('opacity','0');
     }
   }
 
+  // ---------- 实时循环 ----------
   function loop(now){
-    if(!running) return;
-    if(!t0) t0=now;
-    var t=((now-t0)/4000)%1;
-    if(popT>=0){ popT+=1/60; if(popT>0.8) popT=-1; }
+    if(!S.running) return;
+    if(!S.t0) S.t0=now;
+    var t=((now-S.t0)/4000)%1;
+
+    if(S.popT>=0){ S.popT+=1/60; if(S.popT>0.8) S.popT=-1; }
+    if(S.petT>=0){ S.petT+=1/60; if(S.petT>1.4) S.petT=-1; }
+    if(S.leafWiggle>0) S.leafWiggle=Math.max(0,S.leafWiggle-0.03);
+    if(S.giggle>0){ S.giggle-=1/60; S.popT=Math.max(S.popT,0.05); }
+
+    // 拖拽弹簧回弹
+    if(S.drag && S.drag.spring){
+      var g=S.drag;
+      g.vx=(g.vx - g.x*0.16)*0.84;
+      g.vy=(g.vy - g.y*0.16)*0.84;
+      g.x+=g.vx; g.y+=g.vy; g.rot*=0.87;
+      S.dragOff={x:g.x,y:g.y,rot:g.rot};
+      if(Math.abs(g.x)+Math.abs(g.y)+Math.abs(g.vx)+Math.abs(g.vy)+Math.abs(g.rot)<0.8){
+        S.drag=null; S.dragOff={x:0,y:0,rot:0};
+        S.dizzyUntil=0;
+      }
+    } else if(S.drag){
+      S.dragOff={x:S.drag.x,y:S.drag.y,rot:S.drag.rot};
+    }
+
+    // 当前表情
+    if(S.sleeping) S.faceMood='sleep';
+    else if(S.drag && S.drag.spring && (Math.abs(S.drag.x)+Math.abs(S.drag.y)>6)) S.faceMood='dizzy';
+    else if(S.petT>=0) S.faceMood='loved';
+    else if(now<S.moodUntil) S.faceMood=S.mood;
+    else S.faceMood='happy';
+
+    if(now>S.bubbleUntil) bubble.classList.remove('show');
     frame(t);
     requestAnimationFrame(loop);
   }
 
-  // 确定性截帧接口：setFrame(i, total) 暂停实时动画并按帧号渲染
-  window.setFrame=function(i,total){
-    running=false;
-    var t=i/total;
-    popT=-1;
-    frame(t);
-  };
-  window.setProgress=function(p){ progress=Math.max(0,Math.min(3,p)); countEl.textContent=progress+' / 3'; };
-  window.resume=function(){ running=true; t0=0; requestAnimationFrame(loop); };
+  // ---------- 交互动作 ----------
+  function syncProgress(){
+    countEl.textContent=S.progress+' / 3';
+    var ds=dots.children;
+    for(var i=0;i<3;i++) ds[i].classList.toggle('on', i<S.progress);
+  }
+  function water(zone, e){
+    if(S.sleeping){ wake(e); return; }
+    var p=fxPos(e||{clientX:180,clientY:180});
+    if(S.progress>=3){
+      S.progress=0; syncProgress();
+      say(pick(LINES.reset)); floatEmoji('🌸',p.x,p.y-40,7);
+      blip(660,.22); setHint('点一下给它浇水 🌱'); return;
+    }
+    S.progress++; syncProgress(); S.popT=0; blip(520+S.progress*90,.16);
+    floatEmoji('💧',p.x,p.y-70,3);
+    if(zone==='leaf'){ S.leafWiggle=1; say(pick(LINES.leaf)); }
+    else if(zone==='cheek'){ S.winkUntil=performance.now()+700; say(pick(LINES.cheek)); floatEmoji('💗',p.x,p.y,2); }
+    else if(zone==='tummy'){ S.giggle=0.5; say(pick(LINES.tummy)); floatEmoji('✨',p.x,p.y,3); }
+    else say(pick(LINES.water));
+    if(S.progress>=3){ say(pick(LINES.bloom),1900); floatEmoji('🎉',p.x,p.y-60,6); blip(880,.3); setHint('长满啦！再点一下重新长 🌸'); }
+    else setHint(S.progress===1?'再浇一点就长大啦 🌿':'快长满啦，还差一点点 ✨');
+  }
+  function pet(e){
+    var p=fxPos(e||{clientX:180,clientY:150});
+    S.petT=0; S.faceMood='loved'; say(pick(LINES.pet),1600);
+    floatEmoji('💗',p.x,p.y,5); blip(700,.2); setHint('被摸头摸得眯起眼啦～');
+  }
+  function setMood(m){
+    S.mood=m; S.moodUntil=performance.now()+2600; S.faceMood=m;
+    say(pick(LINES.mood[m])); blip(m==='surprised'?880:m==='shy'?440:600,.14);
+    var bs=document.querySelectorAll('[data-mood]');
+    for(var i=0;i<bs.length;i++) bs[i].classList.toggle('on', bs[i].getAttribute('data-mood')===m);
+  }
+  function toggleSleep(){
+    S.sleeping=!S.sleeping;
+    $('btnSleep').classList.toggle('on',S.sleeping);
+    $('btnSleep').textContent = S.sleeping ? '☀️ 唤醒' : '💤 睡觉';
+    if(S.sleeping){ S.faceMood='sleep'; say(pick(LINES.sleep),2200); floatEmoji('💤',450,120,3); setHint('睡着了…点它一下叫醒'); blip(300,.3); }
+    else { S.faceMood='happy'; S.popT=0; say(pick(LINES.wake)); setHint('点一下给它浇水 🌱'); blip(820,.18); }
+  }
+  function wake(e){
+    S.sleeping=false; S.faceMood='surprised'; S.mood='surprised'; S.moodUntil=performance.now()+900;
+    $('btnSleep').classList.remove('on'); $('btnSleep').textContent='💤 睡觉';
+    S.popT=0; say(pick(LINES.wake)); floatEmoji('✨',fxPos(e||{clientX:180,clientY:150}).x,100,4);
+    setHint('点一下给它浇水 🌱'); blip(840,.18);
+  }
+  function reset(){
+    S.progress=0; syncProgress(); S.sleeping=false; S.mood='happy'; S.moodUntil=0;
+    S.popT=-1; S.petT=-1; S.drag=null; S.dragOff={x:0,y:0,rot:0};
+    $('btnSleep').classList.remove('on'); $('btnSleep').textContent='💤 睡觉';
+    setMood('happy'); say(pick(LINES.reset)); setHint('点一下给它浇水 🌱'); blip(520,.14);
+  }
 
-  stage.addEventListener('click',function(e){
-    progress=Math.min(3,progress+1);
-    countEl.textContent=progress+' / 3';
-    hint.textContent = progress>=3 ? '长满啦，好棒！🎉 再点一下重新开始' : '再浇一点就长大啦 🌿';
-    if(progress>=3) setTimeout(function(){ progress=0; countEl.textContent='0 / 3'; hint.textContent='点一下给它浇水 🌱'; },1600);
-    popT=0;
-    if(running) return; // 实时循环里由 loop 推进
-    var start=performance.now();
-    (function step(now){
-      var el=(now-start)/1000;
-      popT=el; frame(((now%4000)/4000));
-      if(el<0.8) requestAnimationFrame(step);
-      else { popT=-1; frame(0); }
-    })(start);
+  // ---------- 指针交互：单击浇水 / 长按摸头 / 拖拽甩 / 双击睡觉 / 眼睛跟随 ----------
+  var press=null, longTimer=null, pendingClicks=[];
+  function zoneOf(target){
+    var n=target;
+    while(n && n!==scene){
+      if(n.getAttribute && n.getAttribute('data-zone')) return n.getAttribute('data-zone');
+      n=n.parentNode;
+    }
+    return 'face';
+  }
+  scene.addEventListener('pointerdown', function(e){
+    if(S.frozen) return;
+    scene.setPointerCapture(e.pointerId);
+    if(pendingClicks.length){ pendingClicks.forEach(clearTimeout); pendingClicks=[]; }
+    if(longTimer){ clearTimeout(longTimer); longTimer=null; }
+    press={x:e.clientX,y:e.clientY,t:performance.now(),moved:false,longFired:false,zone:zoneOf(e.target)};
+    S.drag={x:0,y:0,rot:0,vx:0,vy:0,spring:false};
+    scene.classList.add('grabbing');
+    longTimer=setTimeout(function(){
+      if(press && !press.moved){
+        press.longFired=true;
+        if(S.sleeping) wake(e); else pet(e);
+      }
+    },450);
+  });
+  document.addEventListener('pointermove', function(e){
+    if(!S.frozen){
+      var r=scene.getBoundingClientRect();
+      var nx=(e.clientX-(r.left+r.width/2))/(r.width/2), ny=(e.clientY-(r.top+r.height/2))/(r.height/2);
+      S.eyesX=Math.max(-1,Math.min(1,nx))*3.2;
+      S.eyesY=Math.max(-1,Math.min(1,ny))*2.4;
+    }
+    if(!press) return;
+    var dx=e.clientX-press.x, dy=e.clientY-press.y;
+    if(!press.moved && Math.abs(dx)+Math.abs(dy)>9){
+      press.moved=true; if(longTimer){ clearTimeout(longTimer); longTimer=null; }
+    }
+    if(press.moved && S.drag && !S.drag.spring){
+      S.drag.x=dx; S.drag.y=dy; S.drag.rot=dx*0.06;
+      S.drag.vx=dx-S.drag.x; // 保留末速用于回弹
+      S.dragOff={x:dx,y:dy,rot:S.drag.rot};
+      S.faceMood='dizzy';
+    }
+  });
+  function endPress(e){
+    if(!press) return;
+    var pr=press; press=null;
+    if(longTimer){ clearTimeout(longTimer); longTimer=null; }
+    scene.classList.remove('grabbing');
+    if(pr.moved){
+      if(S.drag){ S.drag.spring=true; S.drag.vx=(Math.random()-0.5)*4; S.drag.vy=-6; }
+      S.dizzyUntil=performance.now()+1400; say(pick(LINES.drag)); setHint('甩得有点晕…松手就弹回来啦'); blip(380,.22);
+    } else if(pr.longFired){
+      // 已触发摸头
+    } else {
+      var t=setTimeout(function(){ water(pr.zone, e); },170);
+      pendingClicks.push(t);
+    }
+  }
+  scene.addEventListener('pointerup', endPress);
+  scene.addEventListener('pointercancel', endPress);
+  scene.addEventListener('dblclick', function(e){
+    e.preventDefault();
+    if(pendingClicks.length){ pendingClicks.forEach(clearTimeout); pendingClicks=[]; }
+    toggleSleep();
   });
 
+  // ---------- 按钮 / 键盘 ----------
+  $('btnWater').addEventListener('click', function(){ water('face', {clientX:180,clientY:180}); });
+  $('btnPet').addEventListener('click', function(){ pet({clientX:180,clientY:140}); });
+  $('btnSleep').addEventListener('click', toggleSleep);
+  $('btnReset').addEventListener('click', reset);
+  $('btnSound').addEventListener('click', function(){
+    S.sound=!S.sound;
+    this.classList.toggle('on',S.sound);
+    this.textContent=S.sound?'🔊 音效':'🔇 音效';
+    if(S.sound) blip(700,.14);
+  });
+  var moods=document.querySelectorAll('[data-mood]');
+  for(var mi=0;mi<moods.length;mi++){
+    moods[mi].addEventListener('click', function(){ setMood(this.getAttribute('data-mood')); });
+  }
+  document.addEventListener('keydown', function(e){
+    if(e.code==='Space'){ e.preventDefault(); water('face',{clientX:180,clientY:180}); }
+    else if(e.key==='z'||e.key==='Z') toggleSleep();
+    else if(e.key==='r'||e.key==='R') reset();
+    else if(e.key==='1') setMood('happy');
+    else if(e.key==='2') setMood('surprised');
+    else if(e.key==='3') setMood('shy');
+    else if(e.key==='4') setMood('sleepy');
+    else if(e.key==='m'||e.key==='M') pet({clientX:180,clientY:140});
+  });
+
+  // ---------- 确定性截帧接口（供 capture_sprout.cjs 使用） ----------
+  window.setFrame=function(i,total){
+    S.running=false; S.frozen=true;
+    document.body.classList.add('capture');
+    S.popT=-1; S.petT=-1; S.drag=null; S.dragOff={x:0,y:0,rot:0};
+    S.eyesX=0; S.eyesY=0; S.faceMood='happy'; S.leafWiggle=0;
+    bubble.classList.remove('show');
+    frame(i/total);
+  };
+  window.setProgress=function(p){
+    S.progress=Math.max(0,Math.min(3,p));
+    countEl.textContent=S.progress+' / 3';
+  };
+  window.resume=function(){
+    S.frozen=false; S.running=true; S.t0=0;
+    document.body.classList.remove('capture');
+    requestAnimationFrame(loop);
+  };
+  // 供自动化验证：直接触发动作、读状态
+  window.doAction=function(name){
+    if(name==='water') water('face',{clientX:180,clientY:180});
+    else if(name==='pet') pet({clientX:180,clientY:140});
+    else if(name==='sleep') toggleSleep();
+    else if(name==='reset') reset();
+    else if(name && name.indexOf('mood:')===0) setMood(name.slice(5));
+  };
+  window.getState=function(){
+    return {progress:S.progress, sleeping:S.sleeping, mood:S.mood,
+            faceMood:S.faceMood, bubble:bubble.textContent, sound:S.sound};
+  };
+
+  syncProgress();
   requestAnimationFrame(loop);
 })();
 </script>
