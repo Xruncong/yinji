@@ -14,7 +14,8 @@ data class Backup(
     val completions: List<HabitCompletionEntity>,
     val transactions: List<TransactionEntity>,
     val notes: List<NoteEntity>,
-    val todos: List<TodoEntity>
+    val todos: List<TodoEntity>,
+    val clockIns: List<ClockInEntity> = emptyList()
 )
 
 object BackupCodec {
@@ -25,7 +26,8 @@ object BackupCodec {
         completions: List<HabitCompletionEntity>,
         transactions: List<TransactionEntity>,
         notes: List<NoteEntity>,
-        todos: List<TodoEntity>
+        todos: List<TodoEntity>,
+        clockIns: List<ClockInEntity> = emptyList()
     ): String {
         val root = JSONObject()
         root.put("app", "yinji")
@@ -80,6 +82,17 @@ object BackupCodec {
                     put("id", it.id); put("title", it.title); put("done", it.done)
                     if (it.dueDate != null) put("dueDate", it.dueDate) else put("dueDate", JSONObject.NULL)
                     if (it.dueTime != null) put("dueTime", it.dueTime) else put("dueTime", JSONObject.NULL)
+                    put("createdAt", it.createdAt); put("updatedAt", it.updatedAt)
+                    if (it.deletedAt != null) put("deletedAt", it.deletedAt) else put("deletedAt", JSONObject.NULL)
+                    put("deviceId", it.deviceId)
+                })
+            }
+        })
+        root.put("clockIns", JSONArray().apply {
+            clockIns.forEach {
+                put(JSONObject().apply {
+                    put("date", it.date); put("type", it.type); put("time", it.time)
+                    put("timestamp", it.timestamp); put("lateMinutes", it.lateMinutes)
                     put("createdAt", it.createdAt); put("updatedAt", it.updatedAt)
                     if (it.deletedAt != null) put("deletedAt", it.deletedAt) else put("deletedAt", JSONObject.NULL)
                     put("deviceId", it.deviceId)
@@ -153,6 +166,17 @@ object BackupCodec {
                 )
             }
         }
-        return Backup(habits, completions, transactions, notes, todos)
+        val clockIns = (0 until arr("clockIns").length()).map { i ->
+            arr("clockIns").getJSONObject(i).let { o ->
+                ClockInEntity(
+                    date = o.optString("date"), type = o.optString("type"),
+                    time = o.optString("time"), timestamp = o.optLong("timestamp"),
+                    lateMinutes = o.optInt("lateMinutes", 0),
+                    createdAt = o.optLong("createdAt"), updatedAt = o.optLong("updatedAt"),
+                    deletedAt = o.optLongOrNull("deletedAt"), deviceId = o.optString("deviceId", "")
+                )
+            }
+        }
+        return Backup(habits, completions, transactions, notes, todos, clockIns)
     }
 }

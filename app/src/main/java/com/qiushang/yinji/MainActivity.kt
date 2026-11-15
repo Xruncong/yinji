@@ -1,5 +1,8 @@
 package com.qiushang.yinji
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.qiushang.yinji.clockin.ClockInScheduler
 import com.qiushang.yinji.data.AppGraph
 import com.qiushang.yinji.ui.BottomNav
 import com.qiushang.yinji.ui.ConfirmDialog
@@ -63,6 +67,21 @@ private fun YinjiApp() {
     var showSettings by remember { mutableStateOf(false) }
     var confirmRestore by remember { mutableStateOf(false) }
     var toastText by remember { mutableStateOf<String?>(null) }
+
+    // Android 13+ 需要运行时申请通知权限，否则到点提醒发不出来
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* 用户拒绝也不崩，只是不弹通知 */ }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        // 首次进入排下一次上班/下班提醒（幂等：每次启动都会重排）
+        ClockInScheduler.schedule(context.applicationContext)
+    }
 
     LaunchedEffect(toastText) {
         toastText?.let {

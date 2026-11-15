@@ -162,3 +162,30 @@ interface TodoDao {
     @Query("DELETE FROM todos")
     suspend fun clear()
 }
+
+@Dao
+interface ClockInDao {
+    @Query("SELECT * FROM clock_in WHERE deletedAt IS NULL ORDER BY date DESC, timestamp DESC")
+    fun all(): Flow<List<ClockInEntity>>
+
+    @Query("SELECT * FROM clock_in WHERE deletedAt IS NULL AND date BETWEEN :from AND :to ORDER BY date ASC, timestamp ASC")
+    fun inRange(from: String, to: String): Flow<List<ClockInEntity>>
+
+    @Query("SELECT * FROM clock_in")
+    suspend fun allSnapshot(): List<ClockInEntity>
+
+    @Query("SELECT * FROM clock_in WHERE date = :date AND type = :type")
+    suspend fun on(date: String, type: String): ClockInEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsert(c: ClockInEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(list: List<ClockInEntity>)
+
+    @Query("UPDATE clock_in SET deletedAt = :now, updatedAt = :now WHERE date = :date AND type = :type")
+    suspend fun cancel(date: String, type: String, now: Long)
+
+    @Query("DELETE FROM clock_in")
+    suspend fun clear()
+}

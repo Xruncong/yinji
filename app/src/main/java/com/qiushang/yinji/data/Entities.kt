@@ -91,3 +91,29 @@ data class TodoEntity(
     val deletedAt: Long? = null,
     val deviceId: String = ""
 )
+
+/**
+ * 上班/下班打卡记录。一天最多两条（上班 on / 下班 off），用 (date, type) 联合主键保证幂等。
+ * 迟到分钟数在打卡时按「提醒设置里的上班时间」算出后落库，避免统计时再解析配置漂移。
+ */
+@Entity(
+    tableName = "clock_in",
+    primaryKeys = ["date", "type"],
+    indices = [Index("date")]
+)
+data class ClockInEntity(
+    // 本地日 yyyy-MM-dd
+    val date: String,
+    // "on" = 上班卡；"off" = 下班卡
+    val type: String,
+    // 打卡时刻 HH:mm
+    val time: String,
+    // 打卡的真实时间戳（毫秒）
+    val timestamp: Long = System.currentTimeMillis(),
+    // 迟到分钟数（仅 type=on 有意义，下班卡恒为 0）
+    val lateMinutes: Int = 0,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis(),
+    val deletedAt: Long? = null,
+    val deviceId: String = ""
+)

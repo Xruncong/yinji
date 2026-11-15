@@ -26,6 +26,7 @@ class YinjiRepository(private val appContext: Context) {
     private val txns = db.transactionDao()
     private val notes = db.noteDao()
     private val todos = db.todoDao()
+    private val clockIns = db.clockInDao()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     /** 写后刷新：不阻塞当前写入，统一在此收口。 */
@@ -171,6 +172,29 @@ class YinjiRepository(private val appContext: Context) {
         refreshWidget()
     }
 
+    // ---- 上班打卡 ----
+    fun clockInFlow(): Flow<List<ClockInEntity>> = clockIns.all()
+    fun clockInInRange(from: String, to: String): Flow<List<ClockInEntity>> = clockIns.inRange(from, to)
+    suspend fun clockInOn(date: String, type: String): ClockInEntity? = clockIns.on(date, type)
+
+    /** 打一次卡（上班/下班）。同一天同类型覆盖写，迟到分钟由调用方按提醒设置算好传入。 */
+    suspend fun clockIn(type: String, date: String, time: String, lateMinutes: Int) {
+        val now = System.currentTimeMillis()
+        clockIns.upsert(
+            ClockInEntity(
+                date = date, type = type, time = time, timestamp = now,
+                lateMinutes = lateMinutes, createdAt = now, updatedAt = now, deletedAt = null
+            )
+        )
+        refreshWidget()
+    }
+
+    /** 取消某天某类型的打卡（软删，可再次打卡覆盖恢复）。 */
+    suspend fun cancelClockIn(date: String, type: String) {
+        clockIns.cancel(date, type, System.currentTimeMillis())
+        refreshWidget()
+    }
+
     // ---- 卡片数据（供 Glance 一次性快照，不依赖 Flow 重组） ----
     suspend fun widgetSnapshot(): WidgetSnapshot {
         val today = Dates.today()
@@ -189,12 +213,13 @@ class YinjiRepository(private val appContext: Context) {
 
     // ---- 导出 / 备份恢复（纯本地 JSON，不联网；一期无会员墙） ----
     suspend fun exportJson(): String = BackupCodec.export(
-        habits.allSnapshot(), habits.allCompletionsSnapshot(), txns.allSnapshot(), notes.allSnapshot(), todos.allSnapshot()
+        habits.allSnapshot(), habits.allCompletionsSnapshot(), txns.allSnapshot(),
+        notes.allSnapshot(), todos.allSnapshot(), clockIns.allSnapshot()
     )
 
     suspend fun importJson(json: String): Result<Unit> = runCatching {
         val b = BackupCodec.import(json)
-        // 跨 5 张表的「清空 + 回灌」必须在同一事务内：任何一行插入失败
+        // 跨 6 张表的「清空 + 回灌」必须在同一事务内：任何一行插入失败
         // （坏备份 / 外键约束冲突）都要整体回滚，不能把用户原数据删光后回不去。
         db.withTransaction {
             habits.clearCompletions()
@@ -202,11 +227,13 @@ class YinjiRepository(private val appContext: Context) {
             txns.clear()
             notes.clear()
             todos.clear()
+            clockIns.clear()
             habits.insertAll(b.habits)
             habits.insertCompletions(b.completions)
             txns.insertAll(b.transactions)
             notes.insertAll(b.notes)
             todos.insertAll(b.todos)
+            clockIns.insertAll(b.clockIns)
         }
         refreshWidget()
     }

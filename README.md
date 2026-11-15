@@ -63,7 +63,7 @@ schemas/                               Room 导出的 schema（KSP 生成）
 
 ## 设计要点（详见 PRD）
 
-- **四块全上但每块做薄**：习惯打卡（首页）、记账、备忘、待办，底部导航 4 tab。
+- **五块**：习惯打卡（首页 + 上班打卡卡）、记账、备忘、待办，底部导航 4 tab。
 - **桌面小卡片**：习惯 + 待办同卡，点一下即写库完成并消失；App 内「已完成」列表可一键恢复（`done` 只标状态不删行）。刷新靠 Repository 层统一 `updateAll()`，0 点靠 `ACTION_DATE_CHANGED` + 重算今日兜底。
 - **金额 `Long` 存分**，月度汇总走 Room `GROUP BY`；日期业务键用本地 `yyyy-MM-dd`，周一起始。
 - **连续天数派生不落库**，按「应做日序列」相邻判断（指定周几的习惯跨周末不断链）。
@@ -99,6 +99,17 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - 新增 `CuteTextField` 统一所有输入框：暖奶油 `Field` 底、14dp 圆角、无下划线、薄荷光标、可带 leadingIcon（备忘搜索框用它）；四页原来 9 个裸 `TextField` 全部替换，记一笔的备注/日期也一并统一。
 - 新增 `SectionLabel`：彩色小圆点 + 粗体分节标签，替换「图标 / 周期 / 截止」等灰小字；emoji 选择、周期按钮、日期快捷（今天/昨天）换成描边圆章与糖果胶囊。
 - 验收：零警告编译；Android 14 模拟器逐个打开新建习惯 / 记一笔 / 新建待办 / 编辑备忘弹层截图复看；`impeccable detect` 零违规。
+
+### v1.4 上班打卡提醒（新功能）
+
+用户要求「增加上班打卡提醒」，先用豆包出四宫格概念图确认方向再实现。概念图见 [`docs/ui-concept-clockin.png`](docs/ui-concept-clockin.png)，提示词见 [`docs/doubao-prompt-clockin.txt`](docs/doubao-prompt-clockin.txt)。四格全部做完：
+
+- **首页打卡卡**（今日页顶部插卡，不破四 tab 底栏）：奶油黄卡 + 圆形进度环小芽，点小芽/「打上班卡」即记到岗时间，另有「打下班卡」。底部进「打卡记录」与「提醒设置」。
+- **提醒设置**：开关 + 上班 09:00 / 下班 18:00 时间选择 + 周一~周五糖果圆 + 提前 5 分钟（准点/5/10/15 分可选），存 SharedPreferences；保存即重排闹钟。
+- **到点通知**：`AlarmManager` 精确定时（无精确闹钟权限自动退回非精确）+ 本地通知，带「已打卡」（`goAsync()` 协程写库、撤通知）/「稍后提醒」（10 分钟后再响）两个按钮；开机/改时间/跨日/升级自动重排；Android 13+ 运行时申请 `POST_NOTIFICATIONS`。
+- **打卡记录**：本月出勤 / 连续打卡 / 迟到三张小卡 + 周一起始月历热力图；连续天数「休息日不打断」，周末打卡也算数。
+- **数据层**：新增 `clock_in` 表（`(date, type)` 联合主键，一天最多上班/下班两条），Room `version=1 → 2` 用**显式 `MIGRATION_1_2`** 保留真机旧数据；导出/恢复 JSON 增加第 6 张表（`BackupCodec.VERSION` 仍 1，旧备份缺键自动空数组向后兼容）；纯本地、不联网、无会员墙、不引新依赖。
+- 验收：零警告编译；Android 14 模拟器逐链路实测——打卡卡渲染、两条打卡写库（`2026-11-15|on|03:47` / `off`）、统计热力图、提醒设置、`dumpsys alarm` 确认两个闹钟已排、以 App 自身 UID 触发到点通知（`NotificationRecord id=1001` / `channel=clock_in_reminder` / `actions=2`）、点「已打卡」按钮写库成功且通知撤除；`impeccable detect` 零违规。
 
 ## 状态（v1 已完成）
 

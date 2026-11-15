@@ -38,6 +38,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.qiushang.yinji.clockin.ClockInCard
+import com.qiushang.yinji.clockin.ClockInSettingsDialog
+import com.qiushang.yinji.clockin.ClockInStatsDialog
 import com.qiushang.yinji.data.HabitEntity
 import com.qiushang.yinji.data.HabitStatsCalculator
 import com.qiushang.yinji.data.YinjiRepository
@@ -72,6 +75,8 @@ fun HabitScreen(repo: YinjiRepository, onSettings: () -> Unit) {
     var showAdd by remember { mutableStateOf(false) }
     var detailId by remember { mutableStateOf<Long?>(null) }
     var confirmDelete by remember { mutableStateOf<HabitEntity?>(null) }
+    var showClockInSettings by remember { mutableStateOf(false) }
+    var showClockInStats by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenHeader(
@@ -79,6 +84,14 @@ fun HabitScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             subtitle = "${today.monthValue} 月 ${today.dayOfMonth} 日 · 周${Dates.weekdayLabel(today)}",
             onSettings = onSettings
         )
+
+        // 上班打卡：今日页顶部插卡，点小芽即打卡；记录 / 提醒设置走底部两个弹层
+        ClockInCard(
+            repo = repo,
+            onOpenSettings = { showClockInSettings = true },
+            onOpenStats = { showClockInStats = true }
+        )
+        Spacer(Modifier.height(12.dp))
 
         // 今日进度卡：奶油薄荷软糖卡 + 手绘小芽（随进度长大）
         Box(
@@ -244,6 +257,13 @@ fun HabitScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             onConfirm = { scope.launch { repo.deleteHabit(h.id) } },
             onDismiss = { confirmDelete = null }
         )
+    }
+
+    if (showClockInSettings) {
+        ClockInSettingsDialog(onDismiss = { showClockInSettings = false })
+    }
+    if (showClockInStats) {
+        ClockInStatsDialog(repo = repo, onDismiss = { showClockInStats = false })
     }
 }
 
