@@ -93,57 +93,66 @@ fun HabitScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         )
         Spacer(Modifier.height(12.dp))
 
-        // 今日进度卡：奶油薄荷软糖卡 + 手绘小芽（随进度长大）
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .shadow(5.dp, YinjiShapes.Card)
-                .clip(YinjiShapes.Card)
-                .background(YinjiColors.PrimarySoft)
-                .border(1.dp, YinjiColors.MintLight, YinjiShapes.Card)
-                .padding(18.dp)
+        // 今日进度汇总卡：四色手账胶带 + 软糖卡 + 浅薄荷内块 + 大数字 / 进度条 / 小猫
+        SummaryCard(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            borderColor = YinjiColors.MintLight
         ) {
             val pct = if (due == 0) 0 else hit * 100 / due
             val f = if (due == 0) 0f else hit.toFloat() / due
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Sprout(Modifier.size(16.dp), color = YinjiColors.PrimaryDark)
-                        Spacer(Modifier.width(6.dp))
-                        Text("今日进度", fontSize = 13.sp, color = YinjiColors.Ink)
-                        Spacer(Modifier.weight(1f))
-                        Text("$pct%", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = YinjiColors.PrimaryDark)
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text("$hit", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
-                        Text(" / $due", fontSize = 18.sp, color = YinjiColors.Muted)
-                    }
-                    Spacer(Modifier.height(10.dp))
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(YinjiShapes.Pill)
-                            .background(YinjiColors.MintLight)
-                    ) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(YinjiShapes.Small)
+                    .background(YinjiColors.PrimarySoft)
+                    .padding(14.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Sprout(Modifier.size(16.dp), color = YinjiColors.PrimaryDark)
+                            Spacer(Modifier.width(6.dp))
+                            Text("今日进度", fontSize = 13.sp, color = YinjiColors.Ink)
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text("$hit", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+                            Text(" / $due", fontSize = 18.sp, color = YinjiColors.Muted)
+                            Spacer(Modifier.width(10.dp))
+                            Box(
+                                Modifier
+                                    .clip(YinjiShapes.Pill)
+                                    .background(YinjiColors.MintLight)
+                                    .padding(horizontal = 10.dp, vertical = 3.dp)
+                            ) {
+                                Text("$pct%", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = YinjiColors.PrimaryDark)
+                            }
+                        }
+                        Spacer(Modifier.height(10.dp))
                         Box(
                             Modifier
-                                .fillMaxWidth(f)
+                                .fillMaxWidth()
                                 .height(8.dp)
                                 .clip(YinjiShapes.Pill)
-                                .background(YinjiColors.PrimaryDark)
-                        )
+                                .background(YinjiColors.MintLight)
+                        ) {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth(f)
+                                    .height(8.dp)
+                                    .clip(YinjiShapes.Pill)
+                                    .background(YinjiColors.PrimaryDark)
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text("点一下圆圈即可打卡，再点一下可取消", fontSize = 11.sp, color = YinjiColors.Muted)
                     }
-                    Spacer(Modifier.height(8.dp))
-                    Text("点一下圆圈即可打卡，再点一下可取消", fontSize = 11.sp, color = YinjiColors.Muted)
+                    Spacer(Modifier.width(8.dp))
+                    SproutBuddy(
+                        modifier = Modifier.size((48 + 30 * f).dp),
+                        color = YinjiColors.Primary
+                    )
                 }
-                Spacer(Modifier.width(10.dp))
-                SproutBuddy(
-                    modifier = Modifier.size((48 + 34 * f).dp),
-                    color = YinjiColors.Primary
-                )
             }
         }
 

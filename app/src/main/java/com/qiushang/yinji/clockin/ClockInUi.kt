@@ -431,8 +431,8 @@ private fun StatMini(label: String, value: String, bg: Color, modifier: Modifier
             .padding(vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(value, fontSize = 17.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
-        Spacer(Modifier.height(2.dp))
+        Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+        Spacer(Modifier.height(3.dp))
         Text(label, fontSize = 10.sp, color = YinjiColors.Muted)
     }
 }

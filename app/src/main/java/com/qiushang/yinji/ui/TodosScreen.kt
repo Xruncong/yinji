@@ -65,10 +65,19 @@ fun TodosScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             ScreenHeader(title = "待办", subtitle = "把要做的事放下", onSettings = onSettings)
 
-            Row(Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Chip("今天 ${todayList.size}", tab == 0, { tab = 0 }, baseColor = YinjiColors.PrimaryDark)
-                Chip("全部 ${undone.size}", tab == 1, { tab = 1 }, baseColor = YinjiColors.CandyGold)
-                Chip("已完成 ${done.size}", tab == 2, { tab = 2 }, baseColor = YinjiColors.CandyPeach)
+            // 待办汇总卡：四色手账胶带 + 糖果分段 + 小猫（对齐概念图）
+            SummaryCard(Modifier.padding(horizontal = 16.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("待办一览", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+                    Spacer(Modifier.weight(1f))
+                    SproutBuddy(Modifier.size(34.dp))
+                }
+                Spacer(Modifier.height(10.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Chip("今天 ${todayList.size}", tab == 0, { tab = 0 }, Modifier.weight(1f), baseColor = YinjiColors.PrimaryDark)
+                    Chip("全部 ${undone.size}", tab == 1, { tab = 1 }, Modifier.weight(1f), baseColor = YinjiColors.CandyGold)
+                    Chip("已完成 ${done.size}", tab == 2, { tab = 2 }, Modifier.weight(1f), baseColor = YinjiColors.CandyPeach)
+                }
             }
 
             Spacer(Modifier.height(10.dp))

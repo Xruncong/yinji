@@ -68,8 +68,12 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenHeader(title = "记账", subtitle = Dates.monthLabel(today), onSettings = onSettings)
 
-        // 月度总额卡（奶油黄强调卡，与概念图一致）
-        CreamCard(Modifier.padding(horizontal = 16.dp)) {
+        // 月度总额汇总卡（奶油黄底 + 四色手账胶带，与概念图一致）
+        SummaryCard(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            background = YinjiColors.Cream.copy(alpha = 0.35f),
+            borderColor = YinjiColors.Cream.copy(alpha = 0.7f)
+        ) {
             Row(Modifier.fillMaxWidth()) {
                 AmountCell("本月支出", Money.format(expenseTotal), YinjiColors.Expense)
                 Box(Modifier.width(1.dp).height(38.dp).background(YinjiColors.Line))
@@ -83,7 +87,7 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
             Text("点色块看金额", fontSize = 11.sp, color = YinjiColors.Muted)
         })
 
-        CardBox(Modifier.padding(horizontal = 16.dp)) {
+        SummaryCard(Modifier.padding(horizontal = 16.dp)) {
             if (sums.isEmpty()) {
                 EmptyHint("本月还没有支出")
             } else {

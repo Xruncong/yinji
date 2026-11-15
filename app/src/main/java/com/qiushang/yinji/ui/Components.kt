@@ -77,6 +77,46 @@ fun CardBox(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -
 }
 
 /**
+ * 汇总卡：四色手账胶带 + 软糖卡（可选底色），各页顶部汇总信息共用。
+ * 视觉对齐豆包「图标 / 汇总信息」概念图；内容仍是 ColumnScope，逻辑由调用方决定。
+ */
+@Composable
+fun SummaryCard(
+    modifier: Modifier = Modifier,
+    background: Color = YinjiColors.Surface,
+    borderColor: Color = YinjiColors.Line,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .shadow(5.dp, YinjiShapes.Card)
+            .clip(YinjiShapes.Card)
+            .background(background)
+            .border(1.dp, borderColor, YinjiShapes.Card)
+    ) {
+        // 顶部四色「手账胶带」，随圆角一起裁切
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(9.dp)
+                .align(Alignment.TopCenter)
+        ) {
+            Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Primary))
+            Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Cream))
+            Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.Peach))
+            Box(Modifier.weight(1f).height(9.dp).background(YinjiColors.MintLight))
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 18.dp, end = 18.dp, top = 25.dp, bottom = 18.dp),
+            content = content
+        )
+    }
+}
+
+/**
  * 手绘小芽：一根短茎 + 两片向上展开的叶子。
  * 纯 Canvas 自绘，不依赖 emoji / 图片资源，缩放不失真。
  */

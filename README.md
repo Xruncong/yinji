@@ -129,6 +129,19 @@ schemas/                               Room 导出的 schema（KSP 生成）
 - **可分享资产**：8 帧合成 [`docs/cat-live.gif`](docs/cat-live.gif) / [`docs/cat-live.mp4`](docs/cat-live.mp4)（8fps 循环）。
 - **验收**：零警告编译；模拟器装后冷启动无崩溃，控件树确认两处「小猫同学」渲染；两帧间隔 260ms 像素差 2860 像素证明动画真在跑；一次真实写库触发 `Repository.refreshWidget()` 的 `updateAll` 后桌面卡片正确重建并显示豆包猫（四色胶带 + 右上角线稿小猫）；`impeccable detect` 零违规。
 
+### v1.7 App 图标 + 各页汇总信息卡（豆包重新设计）
+
+用户要求「app 的图标、每个页面的汇总信息 ui 都重新用豆包设计一下，再更新上去」。概念图见 [`docs/ui-concept-icon-summary.png`](docs/ui-concept-icon-summary.png)（2×3 六格：今日进度 / 记账本月 / 备忘 / 待办 / 打卡统计 / App 图标），提示词见 [`docs/doubao-prompt-icon-summary.txt`](docs/doubao-prompt-icon-summary.txt)。统一签名 = **顶部四色手账胶带 + 大圆角软糖卡 + 深墨绿大数字/标签 + 小猫吉祥物 + 糖果胶囊**。功能逻辑一行未动。
+
+- **App 图标**：概念图第 6 格裁图带「豆包 AI」水印且会被系统裁切 → 不直接用；改用已切好的透明豆包猫帧 `res/drawable/cat_01.png` 做 adaptive icon 前景，Pillow 脚本 `_debug/make_launcher.py` 复刻「奶白底 + 圆角白卡 + 居中简笔小猫 + 左上斜贴四色胶带」。5 个密度 `mipmap-{mdpi..xxxhdpi}` 全出 `ic_launcher.png` / `ic_launcher_round.png` / `ic_launcher_fg.png`，`mipmap-anydpi-v26` 配 `@color/ic_launcher_background`（#FBF8F1）+ foreground + monochrome，`AndroidManifest.xml` 的 application 加 `android:icon` / `android:roundIcon`。不再用系统机器人图标。
+- **共用 `SummaryCard`**（一处改动，五处调用）：四色手账胶带顶条 + 软糖卡（可传底色/描边）+ 内容槽，与 `YDialog` 同一套胶带。
+  - 今日进度卡：外层 `SummaryCard` + 内层浅薄荷块，新增 `pct%` 糖果胶囊，右侧小猫随进度长大。
+  - 记账：月度总额换奶油黄 `SummaryCard`（三列金额 + 竖分隔原样保留），分类占比卡也带上胶带，环形图中央小猫不变。
+  - 备忘：新增汇总卡（44sp 大数字「N 条备忘」+ 热度最高 4 个 `#标签` 糖果 Pill + 小猫），复用已有 `tagsOf()`。
+  - 待办：三分段 Chip 包进 `SummaryCard`（「待办一览」+ 小猫），三个 Chip `weight(1f)` 等宽。
+  - 打卡统计：三张 `StatMini` 数字由 17sp → 22sp，与概念图大数字一致。
+- **验收**：`assembleDebug` 零警告；Android 14 模拟器装后冷启动无 FATAL，四屏汇总卡 + 打卡统计弹层逐张截图实读（胶带/大数字/糖果胶囊/小猫齐全、无挤压遮挡），应用抽屉里确认新图标生效；`impeccable detect --json` 返回 `[]`（零违规）。
+
 ### 会动的小猫（独立互动演示）
 
 [`prototype/sprout-live.html`](prototype/sprout-live.html) 是单文件、双击即玩的简笔画小猫互动演示，与 App 工程相互独立（不改动任何 Kotlin 代码）；配套导出的 [`docs/sprout-live.gif`](docs/sprout-live.gif) 与 [`docs/sprout-live.mp4`](docs/sprout-live.mp4) 是可直接分享的动图/视频资产。

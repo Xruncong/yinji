@@ -109,6 +109,42 @@ fun NotesScreen(repo: YinjiRepository, onSettings: () -> Unit) {
                 }
             )
 
+            // 备忘汇总卡：四色手账胶带 + 大数字 + 糖果 #标签 + 小猫（对齐概念图）
+            SummaryCard(Modifier.padding(horizontal = 16.dp)) {
+                val topTags = visible.flatMap { tagsOf(it.text) }
+                    .groupingBy { it }.eachCount().entries
+                    .sortedByDescending { it.value }.take(4).map { it.key }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Column(Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text("${visible.size}", fontSize = 44.sp, fontWeight = FontWeight.Bold, color = YinjiColors.Ink)
+                            Spacer(Modifier.width(8.dp))
+                            Text("条备忘", fontSize = 13.sp, color = YinjiColors.Muted)
+                        }
+                        if (topTags.isNotEmpty()) {
+                            Spacer(Modifier.height(10.dp))
+                            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                val candy = listOf(
+                                    YinjiColors.MintLight, YinjiColors.Cream,
+                                    YinjiColors.Peach, YinjiColors.PrimarySoft
+                                )
+                                topTags.forEachIndexed { i, t ->
+                                    Box(
+                                        Modifier
+                                            .clip(YinjiShapes.Pill)
+                                            .background(candy[i % candy.size].copy(alpha = 0.6f))
+                                            .padding(horizontal = 10.dp, vertical = 4.dp)
+                                    ) { Text("#$t", fontSize = 11.sp, color = YinjiColors.Ink) }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    SproutBuddy(Modifier.size(56.dp))
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
             SectionTitle("共 ${visible.size} 条")
             if (visible.isEmpty()) {
                 EmptyHint(if (query.isBlank()) "还没有备忘，上面写一句吧" else "没找到匹配的备忘")
