@@ -141,6 +141,7 @@ schemas/                               Room 导出的 schema（KSP 生成）
   - 待办：三分段 Chip 包进 `SummaryCard`（「待办一览」+ 小猫），三个 Chip `weight(1f)` 等宽。
   - 打卡统计：三张 `StatMini` 数字由 17sp → 22sp，与概念图大数字一致。
 - **验收**：`assembleDebug` 零警告；Android 14 模拟器装后冷启动无 FATAL，四屏汇总卡 + 打卡统计弹层逐张截图实读（胶带/大数字/糖果胶囊/小猫齐全、无挤压遮挡），应用抽屉里确认新图标生效；`impeccable detect --json` 返回 `[]`（零违规）。
+- **v1.7.1 奶油卡同色修正**：用户反馈「上班打卡位置外边太宽，同色会更好，记账的位置同样」。根因是这两张卡用 `Cream.copy(alpha = 0.35f)` 半透明底，`shadow` 的暖灰暗色从底下渗上来，在四周形成一圈又宽又偏灰褐的「外边」，与中间浅奶油形成两层不同色；同页分类占比卡是不透明白底，四周干净，构成决定性对照。改法：`Theme.kt` 新增不透明令牌 `CreamSolid = #FFFAEDCE`（约等于旧版 Cream@0.35 叠在 Page 上的中心色，观感不变）与 `CreamEdge = #FFE5D8B0`；`CreamCard`（上班打卡卡）与记账月度总额 `SummaryCard` 都换成实色底 + 同色系 1dp 描边。修完卡片内外同色、宽暗边消失；模拟器 + 真机 Redmi K40 Pro 双端截图复看通过，`impeccable detect` 仍 `[]`。
 
 ### 会动的小猫（独立互动演示）
 

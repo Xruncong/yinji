@@ -184,7 +184,8 @@ fun CategoryEmoji(emoji: String, color: Color, size: Dp = 40.dp, emojiSize: Int 
     ) { Text(emoji, fontSize = emojiSize.sp) }
 }
 
-/** 奶油黄强调卡：用于月度总额等主信息卡，和概念图一致。 */
+/** 奶油黄强调卡：用于月度总额等主信息卡，和概念图一致。
+ *  底色改为不透明实色——半透明会让 shadow 的暗色渗上来，四周形成一圈又宽又暗的「外边」。 */
 @Composable
 fun CreamCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
@@ -192,8 +193,8 @@ fun CreamCard(modifier: Modifier = Modifier, content: @Composable ColumnScope.()
             .fillMaxWidth()
             .shadow(5.dp, YinjiShapes.Card)
             .clip(YinjiShapes.Card)
-            .background(YinjiColors.Cream.copy(alpha = 0.35f))
-            .border(1.dp, YinjiColors.Cream.copy(alpha = 0.7f), YinjiShapes.Card)
+            .background(YinjiColors.CreamSolid)
+            .border(1.dp, YinjiColors.CreamEdge, YinjiShapes.Card)
             .padding(18.dp),
         content = content
     )

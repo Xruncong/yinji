@@ -22,6 +22,11 @@ object YinjiColors {
     val PrimarySoft = Color(0xFFE6F5EF)
     val MintLight = Color(0xFFB7E7D6)
     val Cream = Color(0xFFF7D98C)
+    /** 奶油卡实色：不透明，避免 shadow 从半透明底渗进来形成一圈宽暗边。
+     *  色值约等于旧版 Cream@0.35 叠在 Page 上的中心色，改动只去掉暗边、不改观感。 */
+    val CreamSolid = Color(0xFFFAEDCE)
+    /** 奶油卡描边：同色系略深，仍是 1dp 不透明细线 */
+    val CreamEdge = Color(0xFFE5D8B0)
     val Peach = Color(0xFFF6B8AE)
     /** 糖果色分段：压深一点，保证选中态白字对比度 */
     val CandyGold = Color(0xFFC9922F)

@@ -71,8 +71,8 @@ fun LedgerScreen(repo: YinjiRepository, onSettings: () -> Unit) {
         // 月度总额汇总卡（奶油黄底 + 四色手账胶带，与概念图一致）
         SummaryCard(
             modifier = Modifier.padding(horizontal = 16.dp),
-            background = YinjiColors.Cream.copy(alpha = 0.35f),
-            borderColor = YinjiColors.Cream.copy(alpha = 0.7f)
+            background = YinjiColors.CreamSolid,
+            borderColor = YinjiColors.CreamEdge
         ) {
             Row(Modifier.fillMaxWidth()) {
                 AmountCell("本月支出", Money.format(expenseTotal), YinjiColors.Expense)
